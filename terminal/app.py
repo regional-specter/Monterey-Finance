@@ -1,355 +1,190 @@
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, DataTable, Static, Input
-from textual.containers import Container, Horizontal, Vertical, Grid
+from textual.widgets import DataTable, Static, Input, Footer
+from textual.containers import Horizontal, Vertical
 from terminal.backend.data.yfinance_ext import MarketDataProvider
 from rich.table import Table
 from rich.panel import Panel
+from rich.text import Text
 import asyncio
 
-class TickerBar(Static):
-    """A bar showing major indices at the top."""
-    def on_mount(self) -> None:
-        self.update_indices()
-        self.set_interval(30, self.update_indices)
+# COLORS
+BURGUNDY = "#800000"; DARK_BLUE = "#000080"; AMBER = "#FF9F00"; LIME = "#00FF00"; RED = "#FF3333"; BG = "#000000"
 
-    def update_indices(self) -> None:
-        asyncio.create_task(self._fetch_indices())
+class TopBanner(Static):
+    def update_ticker(self, symbol, name):
+        table = Table.grid(expand=True)
+        table.add_column(justify="left", style="white bold"); table.add_column(justify="center", style="white bold"); table.add_column(justify="right", style="white")
+        table.add_row(f"{symbol} US Equity", "COMPANY OVERVIEW", "MONTEREY FINANCE | [green]● LIVE[/]")
+        self.update(table)
 
-    async def _fetch_indices(self) -> None:
-        provider = MarketDataProvider()
-        indices = await asyncio.to_thread(provider.get_indices)
-        content = "  ".join([
-            f"{idx['name']}: {idx['price']} [ {'green' if idx['raw_pct'] > 0 else 'red'} ]{idx['pct']}[/]"
-            for idx in indices
-        ])
+class NavBar(Static):
+    def update_active(self, index=0):
+        tabs = [(" [0] HOME ",0), (" [1] OVERVIEW ",1), (" [2] ANALYSIS ",2), (" [3] ESTIMATES ",3), (" [4] NEWS ",4)]
+        content = Text()
+        for label, i in tabs:
+            style = f"black on {AMBER}" if i == index else f"white on {DARK_BLUE}"
+            content.append(label, style)
         self.update(content)
 
-class PriceChartPanel(Static):
-    """High-precision Braille-based price action chart."""
-    def update_chart(self, prices: list, symbol: str):
-        if not prices or len(prices) < 2:
-            self.update("[bold red]No chart data available[/]")
-            return
-
-        # Chart Dimensions (in characters)
-        cols, rows = 60, 10
-        # Braille Dimensions (2 dots wide, 4 dots high per char)
-        b_width, b_height = cols * 2, rows * 4
-        
-        min_p, max_p = min(prices), max(prices)
-        range_p = max_p - min_p if max_p != min_p else 1
-        
-        # Scale and resample prices to Braille width
-        resampled = []
-        for i in range(b_width):
-            idx = int(i * (len(prices) - 1) / (b_width - 1))
-            val = prices[idx]
-            y = int((val - min_p) / range_p * (b_height - 1))
-            resampled.append(y)
-        
-        # Grid of Braille dots (8 dots per character)
-        # Dot order in Unicode: 1, 2, 3, 4, 5, 6, 7, 8
+class PriceChart(Static):
+    def update_chart(self, prices, symbol):
+        if not prices: self.update(Panel(Text("No Data", justify="center"), title=f"[bold {AMBER}]8) Price Chart | GP »[/]", border_style=AMBER)); return
+        cols, rows = 60, 10; b_w, b_h = cols * 2, rows * 4
+        min_p, max_p = min(prices), max(prices); rng = (max_p - min_p) or 1
+        res = [int((prices[int(i*(len(prices)-1)/(b_w-1))] - min_p)/rng*(b_h-1)) for i in range(b_w)]
         grid = [[0 for _ in range(cols)] for _ in range(rows)]
-        
-        def set_dot(bx, by):
-            char_x, dot_x = divmod(bx, 2)
-            char_y, dot_y = divmod(b_height - 1 - by, 4)
-            if 0 <= char_x < cols and 0 <= char_y < rows:
-                # Braille dot mapping
-                dot_map = [
-                    [0x01, 0x08],
-                    [0x02, 0x10],
-                    [0x04, 0x20],
-                    [0x40, 0x80]
-                ]
-                grid[char_y][char_x] |= dot_map[dot_y][dot_x]
+        for bx, by in enumerate(res):
+            cx, dx = divmod(bx, 2); cy, dy = divmod(b_h-1-by, 4)
+            if 0<=cx<cols and 0<=cy<rows: grid[cy][cx] |= [[0x01,0x08],[0x02,0x10],[0x04,0x20],[0x40,0x80]][dy][dx]
+        chart_str = "\n".join(["".join(chr(0x2800 + dots) for dots in r) for r in grid])
+        style = LIME if prices[-1] >= prices[0] else RED
+        y_axis = f"{max_p:>8.2f} ┐\n" + "\n".join(["         │" for _ in range(rows-2)]) + f"\n{min_p:>8.2f} ┘"
+        layout = Table.grid(padding=(0,1)); layout.add_row(y_axis, f"[{style}]{chart_str}[/]")
+        self.update(Panel(layout, title=f"[bold {AMBER}]8) Price Chart | GP »[/]", border_style=AMBER, padding=0))
 
-        for bx, by in enumerate(resampled):
-            set_dot(bx, by)
+class MarketHeatmap(Static):
+    def update_heatmap(self, sectors):
+        grid = Table.grid(expand=True, padding=0)
+        grid.add_column(); grid.add_column()
+        for i in range(0, len(sectors), 2):
+            row_cells = []
+            for s in sectors[i:i+2]:
+                color = LIME if s['pct'] > 2 else "#444444" if s['pct'] > 0 else RED if s['pct'] < -2 else "#440000"
+                row_cells.append(Panel(f"[bold white]{s['name']}\n{s['pct']:+.1f}%[/]", style=f"on {color}", padding=0))
+            grid.add_row(*row_cells)
+        self.update(Panel(grid, title=f"[bold {AMBER}]Market Heatmap | WEI[/]", border_style=AMBER, padding=0))
 
-        # Convert grid to Unicode Braille characters
-        chart_lines = []
-        for r in range(rows):
-            line = "".join(chr(0x2800 + dot_mask) for dot_mask in grid[r])
-            chart_lines.append(line)
+class DenseModule(Static):
+    def __init__(self, title, **kwargs): super().__init__(**kwargs); self.title = title
+    def update_data(self, data_dict):
+        grid = Table.grid(expand=True); grid.add_column(style=f"dim {AMBER}"); grid.add_column(style="white", justify="right")
+        for k, v in data_dict.items(): grid.add_row(str(k), str(v))
+        self.update(Panel(grid, title=f"[bold {AMBER}]{self.title}[/]", border_style=AMBER, padding=0))
 
-        style = "green" if prices[-1] >= prices[0] else "red"
-        chart_content = "\n".join([f"[{style}]{line}[/]" for line in chart_lines])
-        
-        y_axis = f"[white]{max_p:>8.2f} ┐[/]\n" + "\n".join(["         │" for _ in range(rows-2)]) + f"\n[white]{min_p:>8.2f} ┘[/]"
-        
-        layout_table = Table.grid(padding=(0, 1))
-        layout_table.add_column(width=12)
-        layout_table.add_column()
-        layout_table.add_row(y_axis, chart_content)
-        
-        self.update(Panel(
-            layout_table,
-            title=f"[bold #FFB000]6M PRICE ACTION: {symbol}[/bold #FFB000]",
-            border_style="#FFB000",
-            padding=(0, 1)
-        ))
+class NewsFeed(Static):
+    def update_news(self, news):
+        table = Table.grid(expand=True, padding=(0, 1))
+        table.add_column(width=4, style=AMBER); table.add_column(width=10, style="dim white"); table.add_column(width=6, style=DARK_BLUE); table.add_column(style="white")
+        if not news: table.add_row("-", "ALPHA-V", "--:--", "No news or API limit reached.")
+        else:
+            for i, n in enumerate(news): table.add_row(str(i+1), n['source'][:10], n['time'], n['title'][:70])
+        self.update(Panel(table, title=f"[bold {AMBER}]Alpha Vantage News Feed[/]", border_style=AMBER, padding=0))
 
-class InfoPanel(Static):
-    """Side panel for detailed security info (DES)."""
-    def update_info(self, data: dict):
-        content = f"""
-[bold #FFB000]SECURITY DESCRIPTION (DES)[/bold #FFB000]
-[white]Symbol:[/] {data['Symbol']}
-[white]Name:[/]   {data['Name']}
-[white]Sector:[/] {data['Sector']}
-
-[bold #FFB000]FUNDAMENTALS[/bold #FFB000]
-[white]P/E:[/]      {data['P/E']}
-[white]Div Yield:[/] {data['Div Yield']}
-[white]52W Range:[/] {data['52W Range']}
-[white]Mkt Cap:[/]   {data['Market Cap']}
-"""
-        self.update(content)
-
-class AnalystPanel(Static):
-    """Panel for Analyst Recommendations (ANR)."""
-    def update_analysis(self, analysis: dict):
-        content = f"""
-[bold #FFB000]ANALYST RECOMMENDATIONS (ANR)[/bold #FFB000]
-[white]Summary:[/] {analysis['Recommendations']}
-[white]Trend:[/]   {analysis['Trend']}
-"""
-        self.update(content)
-
-class TechnicalPanel(Static):
-    """Panel for Technical Indicators (GP)."""
-    def update_technicals(self, analysis: dict):
-        style = "green" if analysis['Signal'] == "BULLISH" else "red" if analysis['Signal'] == "BEARISH" else "white"
-        content = f"""
-[bold #FFB000]TECHNICAL INDICATORS (GP)[/bold #FFB000]
-[white]MA50:[/]    {analysis['MA50']}
-[white]MA200:[/]   {analysis['MA200']}
-[white]Signal:[/]   [{style}]{analysis['Signal']}[/]
-"""
-        self.update(content)
-
-class CompanyBioPanel(Static):
-    """Bottom panel for company biography."""
-    def update_bio(self, bio: str):
-        short_bio = (bio[:400] + '...') if len(bio) > 400 else bio
-        self.update(f"[bold #FFB000]COMPANY PROFILE (PROFILE)[/bold #FFB000]\n\n[grey70]{short_bio}[/grey70]")
-
-class FinancialsPanel(Static):
-    """Panel for financial highlights."""
-    def update_financials(self, data: dict):
-        fin = data['Financials']
-        div = data['Dividends']
-        content = f"""
-[bold #FFB000]FINANCIAL HIGHLIGHTS (FIN)[/bold #FFB000]
-[white]Revenue:[/]    {fin.get('Revenue', 'N/A')}
-[white]Margin:[/]     {fin.get('Profit Margin', 'N/A')}
-[white]Cash:[/]       {fin.get('Cash', 'N/A')}
-
-[bold #FFB000]DIVIDENDS[/bold #FFB000]
-[white]Last Div:[/]   {div.get('Last Div', 'N/A')}
-[white]Ex-Date:[/]    {div.get('Ex-Date', 'N/A')}
-"""
-        self.update(content)
-
-class PriceRangePanel(Static):
-    """Visual representation of price in 52W range."""
-    def update_range(self, pct: float):
-        filled_size = int(pct * 20)
-        empty_size = 20 - filled_size
-        visual_bar = "[green]█[/green]" * filled_size + "[grey30]█[/grey30]" * empty_size
-        
-        content = f"""
-[bold #FFB000]52-WEEK PRICE RANGE VISUAL[/bold #FFB000]
-
-L [white]{visual_bar}[/white] H
-
-[grey50]Current position: {pct*100:.1f}% of range[/grey50]
-"""
-        self.update(content)
-
-class AlgoPanel(Static):
-    """Bottom panel for Quantitative Insights."""
-    def on_mount(self):
-        self.update("[bold #FFB000]QUANTITATIVE INSIGHTS (MARKOV FOREST)[/bold #FFB000]\n[grey50]Analyzing 6-month historical drift... Signal: [green]ACCUMULATE[/green] (Confidence: 84%)[/grey50]")
+class TickerFooter(Static):
+    def update_indices(self, indices):
+        parts = [f"{idx['name']} {idx['price']} [{'green' if idx['raw_pct']>0 else 'red'}]{idx['pct']}[/]" for idx in indices]
+        self.update("  |  ".join(parts))
 
 class TerminalApp(App):
-    """A high-density Bloomberg-style terminal application."""
-
-    CSS = """
-    Screen {
-        background: #000000;
-        color: #ffffff;
-    }
-
-    TickerBar {
-        height: 1;
-        background: #1e1e1e;
-        color: #FFB000;
-        text-style: bold;
-        padding: 0 1;
-    }
-
-    #command-area {
-        height: 3;
-        background: #00008b;
-        border: solid #333333;
-    }
-
-    #go-label {
-        width: 8;
-        background: #008000;
-        color: white;
-        text-align: center;
-        content-align: center middle;
-        text-style: bold;
-    }
-
-    #command-input {
-        background: #00008b;
-        border: none;
-        color: #ffffff;
-    }
-
-    #workspace {
-        height: 1fr;
-    }
-
-    #left-column {
-        width: 65%;
-    }
-
-    #right-column {
-        width: 35%;
-        border-left: solid #333333;
-    }
-
-    PriceChartPanel {
-        height: 16;
-        border-bottom: solid #333333;
-    }
-
-    DataTable {
-        height: 1fr;
-        border-bottom: solid #333333;
-    }
-
-    #sub-workspace {
-        height: 12;
-    }
-
-    CompanyBioPanel {
-        width: 2fr;
-        padding: 1 2;
-        border-right: solid #333333;
-    }
-
-    FinancialsPanel {
-        width: 1fr;
-        padding: 1 2;
-        border-right: solid #333333;
-    }
-
-    PriceRangePanel {
-        width: 1fr;
-        padding: 1 2;
-    }
-
-    InfoPanel, AnalystPanel, TechnicalPanel {
-        height: 1fr;
-        border-bottom: solid #333333;
-        padding: 1 2;
-        background: #0a0a0a;
-    }
-
-    AlgoPanel {
-        height: 5;
-        border: double #FFB000;
-        margin: 0 1;
-        padding: 1 2;
-        color: #FFB000;
-    }
+    CSS = f"""
+    Screen {{ background: {BG}; color: white; }}
+    TopBanner {{ background: #800000; height: 1; padding: 0 1; }}
+    NavBar {{ background: #000080; height: 1; }}
+    #command-row {{ height: 1; background: #1a1a1a; }}
+    #command-input {{ background: transparent; border: none; height: 1; color: white; padding: 0 1; }}
+    .column {{ height: 1fr; border-right: solid #333333; }}
+    #left-col {{ width: 55%; }}
+    #mid-col {{ width: 22%; }}
+    #right-col {{ width: 23%; border: none; }}
+    #summary-box {{ height: 4; border-bottom: solid #333333; padding: 0 1; color: #cccccc; }}
+    PriceChart {{ height: 12; }}
+    #liquidity-bar {{ height: 1; background: #080808; padding: 0 1; color: {AMBER}; }}
+    DataTable {{ height: 1fr; border: none; background: {BG}; scrollbar-size: 0 0; }}
+    MarketHeatmap {{ width: 20; height: 1fr; border-left: solid #333333; }}
+    DenseModule {{ height: auto; }}
+    NewsFeed {{ height: 9; background: #050505; }}
+    TickerFooter {{ height: 1; background: #111111; color: {AMBER}; }}
     """
 
-    BINDINGS = [
-        ("q", "quit", "Quit"),
-        ("r", "refresh", "Refresh"),
-    ]
-
     def compose(self) -> ComposeResult:
-        yield TickerBar()
-        with Horizontal(id="command-area"):
-            yield Static(" <GO> ", id="go-label")
-            yield Input(placeholder="AAPL US <EQUITY> GP", id="command-input")
-        
-        with Horizontal(id="workspace"):
-            with Vertical(id="left-column"):
-                yield PriceChartPanel()
-                yield DataTable()
-                with Horizontal(id="sub-workspace"):
-                    yield CompanyBioPanel()
-                    yield FinancialsPanel()
-                    yield PriceRangePanel()
-            with Vertical(id="right-column"):
-                yield InfoPanel()
-                yield AnalystPanel()
-                yield TechnicalPanel()
-        
-        yield AlgoPanel()
+        yield TopBanner(id="header")
+        yield NavBar(id="nav")
+        yield Horizontal(Static(" <GO> ", id="go-label"), Input(id="command-input"), id="command-row")
+        with Horizontal(id="main-grid"):
+            with Vertical(id="left-col", classes="column"):
+                yield Static(id="summary-box")
+                yield PriceChart()
+                with Horizontal():
+                    yield DataTable()
+                    yield MarketHeatmap()
+                yield Static(id="liquidity-bar")
+            with Vertical(id="mid-col", classes="column"):
+                yield DenseModule("Estimates | EE", id="estimates")
+                yield DenseModule("Financial Ratios", id="ratios")
+                yield DenseModule("Income Snapshot", id="income")
+                yield DenseModule("Dividend | DVD", id="dividends")
+            with Vertical(id="right-col", classes="column"):
+                yield DenseModule("Corporate Info", id="corporate")
+                yield DenseModule("Technical Signals", id="technicals")
+                yield DenseModule("Management | MGMT", id="management")
+        yield NewsFeed()
+        yield TickerFooter()
         yield Footer()
 
-    def on_mount(self) -> None:
+    async def on_mount(self):
+        self.query_one(NavBar).update_active(0)
         table = self.query_one(DataTable)
-        table.add_columns("SYMBOL", "PRICE", "CHANGE", "CHG %", "MKT CAP")
+        table.add_columns("SYM", "PX", "CHG", "CHG%", "MKT CAP")
         table.cursor_type = "row"
-        self.action_refresh()
+        self.tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "NFLX"]
+        await self.action_refresh()
 
-    async def action_refresh(self) -> None:
+    async def action_refresh(self):
+        provider = MarketDataProvider()
+        ticker_data = await asyncio.to_thread(provider.get_ticker_data, self.tickers)
+        sectors = await asyncio.to_thread(provider.get_sector_data)
+        indices = await asyncio.to_thread(provider.get_indices)
+        
+        self.query_one(MarketHeatmap).update_heatmap(sectors)
+        self.query_one(TickerFooter).update_indices(indices)
+        
         table = self.query_one(DataTable)
         table.clear()
+        for row in ticker_data:
+            style = LIME if row["Raw Change %"] > 0 else RED
+            table.add_row(row["Symbol"], row["Price"], f"[{style}]{row['Change']}[/]", f"[{style}]{row['Change %']}[/]", row["Mkt Cap"], key=row["Symbol"])
         
+        if ticker_data: await self.load_ticker(ticker_data[0]['Symbol'])
+
+    async def on_data_table_row_selected(self, event: DataTable.RowSelected):
+        await self.load_ticker(str(event.row_key.value))
+
+    async def load_ticker(self, symbol):
         provider = MarketDataProvider()
-        self.tickers_list = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "NFLX"]
+        data, hist, news = await asyncio.gather(
+            asyncio.to_thread(provider.get_full_analysis, symbol),
+            asyncio.to_thread(provider.get_history, symbol),
+            asyncio.to_thread(provider.get_av_news, symbol)
+        )
+        if not data: return
         
-        data = await asyncio.to_thread(provider.get_ticker_data, self.tickers_list)
-        self.full_data = {d['Symbol']: d for d in data}
+        tech = provider.calculate_technicals(hist)
+        prof = data['Profile']
+        self.query_one(TopBanner).update_ticker(symbol, prof['Name'])
+        self.query_one("#summary-box").update(f"[dim {AMBER}]Profile | »[/] {prof['Summary'][:250]}...")
+        self.query_one(PriceChart).update_chart(hist, symbol)
         
-        for row in data:
-            style = "green" if row["Raw Change %"] > 0 else "red" if row["Raw Change %"] < 0 else "white"
-            table.add_row(
-                row["Symbol"],
-                row["Price"],
-                f"[{style}]{row['Change']}[/]",
-                f"[{style}]{row['Change %']}[/]",
-                row["Market Cap"],
-                key=row["Symbol"]
-            )
+        # Mid Column
+        self.query_one("#estimates").update_data(data['Estimates'])
+        self.query_one("#ratios").update_data(data['Ratios'])
+        self.query_one("#income").update_data(data['Income'])
+        self.query_one("#dividends").update_data(data['Dividends'])
         
-        if data:
-            await self.update_detailed_panels(data[0]['Symbol'])
-
-    async def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        ticker = str(event.row_key.value)
-        await self.update_detailed_panels(ticker)
-
-    async def update_detailed_panels(self, ticker: str) -> None:
-        if ticker in self.full_data:
-            self.query_one(InfoPanel).update_info(self.full_data[ticker])
-            
-            provider = MarketDataProvider()
-            analysis, details, history = await asyncio.gather(
-                asyncio.to_thread(provider.get_analysis_data, ticker),
-                asyncio.to_thread(provider.get_detailed_analysis, ticker),
-                asyncio.to_thread(provider.get_history, ticker)
-            )
-            
-            self.query_one(PriceChartPanel).update_chart(history, ticker)
-            self.query_one(AnalystPanel).update_analysis(analysis)
-            self.query_one(TechnicalPanel).update_technicals(analysis)
-            self.query_one(CompanyBioPanel).update_bio(details['Summary'])
-            self.query_one(FinancialsPanel).update_financials(details)
-            self.query_one(PriceRangePanel).update_range(details['PricePos'])
+        # Right Column
+        self.query_one("#corporate").update_data({"HQ": prof['HQ'], "Staff": prof['Employees'], "Web": prof['Website']})
+        self.query_one("#technicals").update_data({
+            "RSI(14)": tech['RSI'],
+            "Signal": tech['MA_Signal'],
+            "MA50": tech['MA50'],
+            "MA200": tech['MA200']
+        })
+        self.query_one("#management").update_data({m['title']: m['name'] for m in data['Management']})
+        
+        # Left Liquidity Bar
+        liq = data['Liquidity']
+        self.query_one("#liquidity-bar").update(f"VOL: {liq['Vol']} | AVG: {liq['Avg Vol']} | RATIO: {liq['Vol/Avg']}")
+        
+        self.query_one(NewsFeed).update_news(news)
 
 if __name__ == "__main__":
-    app = TerminalApp()
-    app.run()
+    TerminalApp().run()
