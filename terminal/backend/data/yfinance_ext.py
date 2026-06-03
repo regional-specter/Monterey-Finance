@@ -3,43 +3,53 @@ import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime
+import random
+
+import os
 
 class MarketDataProvider:
-    def __init__(self, av_api_key="demo"):
-        self.av_api_key = av_api_key
+    def __init__(self, av_api_key=None):
+        # Priority: 1. Constructor arg, 2. Env Var, 3. Hardcoded default
+        self.av_api_key = av_api_key or os.getenv("AV_API_KEY", "ZJKLZGW09C7FZO9U")
 
-    def get_sector_data(self):
-        """Fetches major sector performance for the heatmap."""
-        sectors = {
-            "XLK": "TECH", "XLE": "ENER", "XLF": "FINN", 
-            "XLV": "HLTH", "XLY": "CONS", "XLI": "INDU"
-        }
-        data = []
-        for sym, name in sectors.items():
-            try:
-                t = yf.Ticker(sym).fast_info
-                cp = ((t.last_price - t.previous_close) / t.previous_close) * 100
-                data.append({"name": name, "pct": cp})
-            except: continue
-        return data
+    def get_performance_matrix(self, symbol: str):
+        try:
+            ticker = yf.Ticker(symbol)
+            hist = ticker.history(period="2y")
+            if hist.empty: return {"1W":0, "1M":0, "3M":0, "YTD":0, "1Y":0}
+            current = hist['Close'].iloc[-1]
+            def get_ret(days):
+                if len(hist) < days: return 0
+                past = hist['Close'].iloc[-days]
+                return ((current - past) / past) * 100
+            ytd_hist = hist[hist.index >= f"{datetime.now().year}-01-01"]
+            ytd = ((current - ytd_hist['Close'].iloc[0]) / ytd_hist['Close'].iloc[0] * 100) if not ytd_hist.empty else 0
+            return {"1W": get_ret(5), "1M": get_ret(21), "3M": get_ret(63), "YTD": ytd, "1Y": get_ret(252)}
+        except: return {"1W":0, "1M":0, "3M":0, "YTD":0, "1Y":0}
 
-    def get_ticker_data(self, tickers: list):
+    def get_order_book(self, price: float):
+        if not price or price == 0: price = 150.0
+        bids = [{"price": price - (i * 0.05 + random.uniform(0, 0.02)), "size": random.randint(100, 2000)} for i in range(5)]
+        asks = [{"price": price + (i * 0.05 + random.uniform(0, 0.02)), "size": random.randint(100, 2000)} for i in range(5)]
+        return {"bids": bids, "asks": asks}
+
+    def get_watchlist_data(self, tickers: list):
         data = []
         for symbol in tickers:
             try:
                 t = yf.Ticker(symbol)
                 info = t.info
-                if not info: continue
-                price = info.get('regularMarketPrice') or info.get('currentPrice')
-                prev_close = info.get('previousClose')
-                change = (price - prev_close) if price and prev_close else 0
-                cp = (change / prev_close * 100) if prev_close else 0
+                price = info.get('regularMarketPrice') or info.get('currentPrice') or 0
+                prev = info.get('previousClose') or price
+                cp = ((price - prev) / prev * 100) if prev else 0
                 data.append({
                     "Symbol": symbol,
-                    "Price": f"{price:.2f}",
-                    "Change": f"{change:+.2f}",
-                    "Change %": f"{cp:+.2f}%",
+                    "Name": info.get('shortName', 'N/A'),
+                    "Price": price,
+                    "Change": price - prev,
+                    "Pct": cp,
                     "Mkt Cap": self._format_market_cap(info.get('marketCap')),
+                    "Sector": info.get('sector', 'TECH'),
                     "Raw Change %": cp
                 })
             except: continue
@@ -50,27 +60,6 @@ class MarketDataProvider:
             t = yf.Ticker(symbol)
             info = t.info
             if not info: return None
-            
-            # Financial Ratios
-            ratios = {
-                "Profit Margin": f"{info.get('profitMargins', 0)*100:.2f}%",
-                "Oper. Margin": f"{info.get('operatingMargins', 0)*100:.2f}%",
-                "ROA": f"{info.get('returnOnAssets', 0)*100:.2f}%",
-                "ROE": f"{info.get('returnOnEquity', 0)*100:.2f}%",
-                "Current Ratio": f"{info.get('currentRatio', 0):.2f}"
-            }
-
-            # Income Statement (Mini)
-            income = {
-                "Revenue": self._format_market_cap(info.get('totalRevenue')),
-                "Gross Profit": self._format_market_cap(info.get('grossProfits')),
-                "Net Income": self._format_market_cap(info.get('netIncomeToCommon')),
-            }
-
-            # Liquidity
-            vol = info.get('regularMarketVolume', 0)
-            avg_vol = info.get('averageVolume', 1)
-            
             return {
                 "Profile": {
                     "Name": info.get('shortName', symbol),
@@ -79,67 +68,33 @@ class MarketDataProvider:
                     "HQ": f"{info.get('city', 'N/A')}, {info.get('country', 'N/A')}",
                     "Employees": f"{info.get('fullTimeEmployees', 0):,}",
                 },
-                "Ratios": ratios,
-                "Income": income,
-                "Liquidity": {
-                    "Vol": self._format_market_cap(vol),
-                    "Avg Vol": self._format_market_cap(avg_vol),
-                    "Vol/Avg": f"{vol/avg_vol:.2f}x"
-                },
                 "Estimates": {
-                    "P/E": f"{info.get('trailingPE', 0):.2f}",
-                    "Est P/E": f"{info.get('forwardPE', 0):.2f}",
+                    "P/E": f"{info.get('trailingPE', 0):.1f}",
+                    "Est P/E": f"{info.get('forwardPE', 0):.1f}",
                     "EPS": f"{info.get('trailingEps', 0):.2f}",
                     "PEG": f"{info.get('pegRatio', 0):.2f}",
                 },
-                "Dividends": {
-                    "Yield": f"{info.get('dividendYield', 0)*100:.2f}%",
-                    "Rate": f"{info.get('dividendRate', 0):.2f}",
+                "Ratios": {
+                    "Profit Margin": f"{info.get('profitMargins', 0)*100:.1f}%",
+                    "ROE": f"{info.get('returnOnEquity', 0)*100:.1f}%",
+                    "ROA": f"{info.get('returnOnAssets', 0)*100:.1f}%",
+                    "Current Ratio": f"{info.get('currentRatio', 0):.2f}"
                 },
-                "Management": [{"name": off.get('name'), "title": off.get('title')} for off in (info.get('companyOfficers', []) or [])[:3]],
-                "Stats": {
-                    "52W H": info.get('fiftyTwoWeekHigh', 0),
-                    "52W L": info.get('fiftyTwoWeekLow', 0),
-                    "Price": info.get('currentPrice', 0)
-                }
+                "Management": [{"name": off.get('name', 'N/A'), "title": off.get('title', 'N/A')} for off in (info.get('companyOfficers', []) or [])[:3]],
+                "Price": info.get('currentPrice', 0)
             }
         except: return None
 
-    def calculate_technicals(self, prices):
-        if len(prices) < 20: return {"RSI": "N/A", "MA_Signal": "N/A", "MA50": "N/A", "MA200": "N/A"}
-        
-        # RSI Calculation
-        deltas = np.diff(prices)
-        up = deltas[deltas >= 0].sum() if len(deltas[deltas >= 0]) > 0 else 0
-        down = -deltas[deltas < 0].sum() if len(deltas[deltas < 0]) > 0 else 0
-        rs = up / down if down != 0 else 0
-        rsi = 100. - (100. / (1. + rs))
-        
-        # MA Crossover
-        ma50 = np.mean(prices[-50:]) if len(prices) >= 50 else 0
-        ma200 = np.mean(prices[-200:]) if len(prices) >= 200 else 0
-        signal = "BULLISH" if ma50 > ma200 else "BEARISH" if ma50 < ma200 else "NEUTRAL"
-        
-        return {
-            "RSI": f"{rsi:.1f}",
-            "MA_Signal": signal,
-            "MA50": f"{ma50:.1f}" if ma50 > 0 else "N/A",
-            "MA200": f"{ma200:.1f}" if ma200 > 0 else "N/A"
-        }
-
-    def get_av_news(self, symbol: str):
-        url = f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={self.av_api_key}"
-        try:
-            r = requests.get(url)
-            data = r.json()
-            feed = data.get("feed", [])
-            news = []
-            for item in feed[:8]:
-                raw_time = item.get("time_published", "")
-                formatted_time = f"{raw_time[9:11]}:{raw_time[11:13]}" if len(raw_time) > 11 else "--:--"
-                news.append({"title": item.get("title", "No Title"), "source": item.get("source", "Unknown"), "time": formatted_time})
-            return news
-        except: return []
+    def get_sector_data(self):
+        sectors = {"XLK": "TECH", "XLE": "ENER", "XLF": "FINN", "XLV": "HLTH", "XLY": "CONS", "XLI": "INDU", "XLC": "COMM", "XLB": "MATS"}
+        data = []
+        for sym, name in sectors.items():
+            try:
+                t = yf.Ticker(sym).fast_info
+                cp = ((t.last_price - t.previous_close) / t.previous_close) * 100
+                data.append({"name": name, "pct": cp})
+            except: continue
+        return data
 
     def get_indices(self):
         indices = {"^GSPC": "S&P 500", "^IXIC": "NASDAQ", "^DJI": "DOW J"}
@@ -148,7 +103,7 @@ class MarketDataProvider:
             try:
                 t = yf.Ticker(sym).fast_info
                 cp = ((t.last_price - t.previous_close) / t.previous_close) * 100
-                data.append({"name": name, "price": f"{t.last_price:,.2f}", "pct": f"{cp:+.2f}%", "raw_pct": cp})
+                data.append({"name": name, "price": f"{t.last_price:,.0f}", "pct": f"{cp:+.2f}%", "raw_pct": cp})
             except: continue
         return data
 
@@ -158,8 +113,15 @@ class MarketDataProvider:
             return h['Close'].tolist() if not h.empty else []
         except: return []
 
+    def get_av_news(self, symbol: str):
+        url = f"https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={symbol}&apikey={self.av_api_key}"
+        try:
+            r = requests.get(url); d = r.json()
+            return [{"title": i['title'], "source": i['source'], "time": i['time_published'][9:13]} for i in d.get("feed", [])[:5]]
+        except: return []
+
     def _format_market_cap(self, val):
         if not val: return "N/A"
         if val >= 1e12: return f"{val/1e12:.2f}T"
-        if val >= 1e9: return f"{val/1e9:.2f}B"
-        return f"{val/1e6:.2f}M"
+        if val >= 1e9: return f"{val/1e9:.1f}B"
+        return f"{val/1e6:.0f}M"

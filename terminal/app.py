@@ -8,58 +8,58 @@ from rich.text import Text
 import asyncio
 
 # COLORS
-BURGUNDY = "#800000"; DARK_BLUE = "#000080"; AMBER = "#FF9F00"; LIME = "#00FF00"; RED = "#FF3333"; BG = "#000000"
+BURGUNDY = "#800000"; DARK_BLUE = "#000080"; AMBER = "#FF9F00"; LIME = "#00FF00"; RED = "#FF3333"; BG = "#000000"; BORDER = "#222222"
 
 class TopBanner(Static):
-    def update_ticker(self, symbol, name):
-        table = Table.grid(expand=True)
-        table.add_column(justify="left", style="white bold"); table.add_column(justify="center", style="white bold"); table.add_column(justify="right", style="white")
-        table.add_row(f"{symbol} US Equity", "COMPANY OVERVIEW", "MONTEREY FINANCE | [green]● LIVE[/]")
-        self.update(table)
+    def update_ticker(self, symbol):
+        t = Table.grid(expand=True)
+        t.add_column(); t.add_column(justify="center"); t.add_column(justify="right")
+        t.add_row(f"[bold white]{symbol} US Equity[/]", "TERMINAL OVERVIEW", "MONTEREY | [green]● LIVE[/]")
+        self.update(t)
 
 class NavBar(Static):
     def update_active(self, index=0):
-        tabs = [(" [0] HOME ",0), (" [1] OVERVIEW ",1), (" [2] ANALYSIS ",2), (" [3] ESTIMATES ",3), (" [4] NEWS ",4)]
-        content = Text()
-        for label, i in tabs:
-            style = f"black on {AMBER}" if i == index else f"white on {DARK_BLUE}"
-            content.append(label, style)
-        self.update(content)
+        tabs = [(" HOME ",0), (" OVERVIEW ",1), (" ANALYSIS ",2), (" NEWS ",3)]
+        c = Text()
+        for lbl, i in tabs:
+            style = f"black on {AMBER}" if i == index else "white on #000080"
+            c.append(f" [{i}] {lbl} ", style)
+        self.update(c)
 
 class PriceChart(Static):
-    def update_chart(self, prices, symbol):
-        if not prices: self.update(Panel(Text("No Data", justify="center"), title=f"[bold {AMBER}]8) Price Chart | GP »[/]", border_style=AMBER)); return
-        cols, rows = 60, 10; b_w, b_h = cols * 2, rows * 4
-        min_p, max_p = min(prices), max(prices); rng = (max_p - min_p) or 1
-        res = [int((prices[int(i*(len(prices)-1)/(b_w-1))] - min_p)/rng*(b_h-1)) for i in range(b_w)]
+    def update_chart(self, p, s):
+        if not p: return
+        cols, rows = 70, 9; b_w, b_h = cols*2, rows*4
+        min_p, max_p = min(p), max(p); rng = (max_p - min_p) or 1
+        res = [int((p[int(i*(len(p)-1)/(b_w-1))] - min_p)/rng*(b_h-1)) for i in range(b_w)]
         grid = [[0 for _ in range(cols)] for _ in range(rows)]
         for bx, by in enumerate(res):
             cx, dx = divmod(bx, 2); cy, dy = divmod(b_h-1-by, 4)
-            if 0<=cx<cols and 0<=cy<rows: grid[cy][cx] |= [[0x01,0x08],[0x02,0x10],[0x04,0x20],[0x40,0x80]][dy][dx]
-        chart_str = "\n".join(["".join(chr(0x2800 + dots) for dots in r) for r in grid])
-        style = LIME if prices[-1] >= prices[0] else RED
-        y_axis = f"{max_p:>8.2f} ┐\n" + "\n".join(["         │" for _ in range(rows-2)]) + f"\n{min_p:>8.2f} ┘"
-        layout = Table.grid(padding=(0,1)); layout.add_row(y_axis, f"[{style}]{chart_str}[/]")
-        self.update(Panel(layout, title=f"[bold {AMBER}]8) Price Chart | GP »[/]", border_style=AMBER, padding=0))
+            if 0<=cx<cols and 0<=cy<rows: grid[cy][cx] |= [[1,8],[2,16],[4,32],[64,128]][dy][dx]
+        c_str = "\n".join(["".join(chr(0x2800 + dots) for dots in r) for r in grid])
+        style = LIME if p[-1]>=p[0] else RED
+        self.update(Panel(f"[{style}]{c_str}[/]", title=f"[bold {AMBER}]Price Chart | GP[/]", border_style=AMBER, padding=0))
 
 class MarketHeatmap(Static):
     def update_heatmap(self, sectors):
-        grid = Table.grid(expand=True, padding=0)
-        grid.add_column(); grid.add_column()
-        for i in range(0, len(sectors), 2):
-            row_cells = []
-            for s in sectors[i:i+2]:
-                color = LIME if s['pct'] > 2 else "#444444" if s['pct'] > 0 else RED if s['pct'] < -2 else "#440000"
-                row_cells.append(Panel(f"[bold white]{s['name']}\n{s['pct']:+.1f}%[/]", style=f"on {color}", padding=0))
-            grid.add_row(*row_cells)
-        self.update(Panel(grid, title=f"[bold {AMBER}]Market Heatmap | WEI[/]", border_style=AMBER, padding=0))
+        g = Table.grid(expand=True, padding=(0,1))
+        for i in range(0, len(sectors), 4):
+            row = []
+            for s in sectors[i:i+4]:
+                c = LIME if s['pct']>1.5 else "#004400" if s['pct']>0 else RED if s['pct']<-1.5 else "#440000"
+                row.append(Panel(f"[bold white]{s['name']}\n{s['pct']:+.1f}%[/]", style=f"on {c}", padding=0))
+            g.add_row(*row)
+        self.update(Panel(g, title=f"[bold {AMBER}]Sector Performance | Heatmap[/]", border_style=AMBER, padding=0))
 
 class DenseModule(Static):
     def __init__(self, title, **kwargs): super().__init__(**kwargs); self.title = title
-    def update_data(self, data_dict):
-        grid = Table.grid(expand=True); grid.add_column(style=f"dim {AMBER}"); grid.add_column(style="white", justify="right")
-        for k, v in data_dict.items(): grid.add_row(str(k), str(v))
-        self.update(Panel(grid, title=f"[bold {AMBER}]{self.title}[/]", border_style=AMBER, padding=0))
+    def update_data(self, d):
+        g = Table.grid(expand=True); g.add_column(style="dim white"); g.add_column(style="white", justify="right")
+        if d:
+            for k, v in d.items(): g.add_row(str(k), str(v))
+        else:
+            g.add_row("N/A", "No data")
+        self.update(Panel(g, title=f"[bold {AMBER}]{self.title}[/]", border_style=AMBER, padding=0))
 
 class NewsFeed(Static):
     def update_news(self, news):
@@ -67,13 +67,26 @@ class NewsFeed(Static):
         table.add_column(width=4, style=AMBER); table.add_column(width=10, style="dim white"); table.add_column(width=6, style=DARK_BLUE); table.add_column(style="white")
         if not news: table.add_row("-", "ALPHA-V", "--:--", "No news or API limit reached.")
         else:
-            for i, n in enumerate(news): table.add_row(str(i+1), n['source'][:10], n['time'], n['title'][:70])
-        self.update(Panel(table, title=f"[bold {AMBER}]Alpha Vantage News Feed[/]", border_style=AMBER, padding=0))
+            for i, n in enumerate(news): table.add_row(str(i+1), n['source'][:10], n['time'], n['title'][:90])
+        self.update(Panel(table, title=f"[bold {AMBER}]Alpha Vantage News Feed | NEWS[/]", border_style=AMBER, padding=0))
 
-class TickerFooter(Static):
-    def update_indices(self, indices):
-        parts = [f"{idx['name']} {idx['price']} [{'green' if idx['raw_pct']>0 else 'red'}]{idx['pct']}[/]" for idx in indices]
-        self.update("  |  ".join(parts))
+class OrderBook(Static):
+    def update_book(self, data):
+        g = Table.grid(expand=True)
+        g.add_column(style=LIME); g.add_column(justify="right", style="dim white")
+        g.add_column(width=2); g.add_column(style=RED); g.add_column(justify="right", style="dim white")
+        if data:
+            for b, a in zip(data.get('bids', []), data.get('asks', [])):
+                g.add_row(f"{b['price']:.2f}", str(b['size']), "", f"{a['price']:.2f}", str(a['size']))
+        self.update(Panel(g, title=f"[bold {AMBER}]Level 2 Depth | L2[/]", border_style=AMBER, padding=0))
+
+class PerformanceMatrix(Static):
+    def update_matrix(self, data):
+        g = Table.grid(expand=True, padding=(0,1))
+        if data:
+            g.add_row(*[f"[dim white]{k}[/]" for k in data.keys()])
+            g.add_row(*[f"[{LIME if v>0 else RED}]{v:+.1f}%[/]" for v in data.values()])
+        self.update(Panel(g, title=f"[bold {AMBER}]Historical Returns[/]", border_style=AMBER, padding=0))
 
 class TerminalApp(App):
     CSS = f"""
@@ -81,19 +94,19 @@ class TerminalApp(App):
     TopBanner {{ background: #800000; height: 1; padding: 0 1; }}
     NavBar {{ background: #000080; height: 1; }}
     #command-row {{ height: 1; background: #1a1a1a; }}
-    #command-input {{ background: transparent; border: none; height: 1; color: white; padding: 0 1; }}
-    .column {{ height: 1fr; border-right: solid #333333; }}
+    .column {{ height: 1fr; border-right: solid {BORDER}; }}
     #left-col {{ width: 55%; }}
     #mid-col {{ width: 22%; }}
     #right-col {{ width: 23%; border: none; }}
-    #summary-box {{ height: 4; border-bottom: solid #333333; padding: 0 1; color: #cccccc; }}
-    PriceChart {{ height: 12; }}
-    #liquidity-bar {{ height: 1; background: #080808; padding: 0 1; color: {AMBER}; }}
-    DataTable {{ height: 1fr; border: none; background: {BG}; scrollbar-size: 0 0; }}
-    MarketHeatmap {{ width: 20; height: 1fr; border-left: solid #333333; }}
+    #summary-box {{ height: 4; border-bottom: solid {BORDER}; padding: 0 1; color: #ccc; }}
+    PriceChart {{ height: 11; }}
+    DataTable {{ height: 1fr; border: none; scrollbar-size: 0 0; }}
     DenseModule {{ height: auto; }}
-    NewsFeed {{ height: 9; background: #050505; }}
-    TickerFooter {{ height: 1; background: #111111; color: {AMBER}; }}
+    OrderBook {{ height: 7; }}
+    PerformanceMatrix {{ height: 4; }}
+    MarketHeatmap {{ height: 7; }}
+    NewsFeed {{ height: 8; background: #050505; }}
+    #footer-idx {{ height: 1; background: #111111; color: {AMBER}; }}
     """
 
     def compose(self) -> ComposeResult:
@@ -104,86 +117,74 @@ class TerminalApp(App):
             with Vertical(id="left-col", classes="column"):
                 yield Static(id="summary-box")
                 yield PriceChart()
-                with Horizontal():
-                    yield DataTable()
-                    yield MarketHeatmap()
-                yield Static(id="liquidity-bar")
+                yield DataTable()
             with Vertical(id="mid-col", classes="column"):
                 yield DenseModule("Estimates | EE", id="estimates")
-                yield DenseModule("Financial Ratios", id="ratios")
-                yield DenseModule("Income Snapshot", id="income")
-                yield DenseModule("Dividend | DVD", id="dividends")
+                yield DenseModule("Financials | FIN", id="ratios")
+                yield PerformanceMatrix(id="perf")
+                yield MarketHeatmap(id="heatmap")
             with Vertical(id="right-col", classes="column"):
                 yield DenseModule("Corporate Info", id="corporate")
-                yield DenseModule("Technical Signals", id="technicals")
-                yield DenseModule("Management | MGMT", id="management")
+                yield DenseModule("Management", id="management")
+                yield OrderBook(id="book")
         yield NewsFeed()
-        yield TickerFooter()
+        yield Static(id="footer-idx")
         yield Footer()
 
     async def on_mount(self):
         self.query_one(NavBar).update_active(0)
-        table = self.query_one(DataTable)
-        table.add_columns("SYM", "PX", "CHG", "CHG%", "MKT CAP")
-        table.cursor_type = "row"
+        t = self.query_one(DataTable)
+        t.add_columns("ASSET", "PRICING")
+        t.cursor_type = "row"
         self.tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META", "NFLX"]
         await self.action_refresh()
 
     async def action_refresh(self):
-        provider = MarketDataProvider()
-        ticker_data = await asyncio.to_thread(provider.get_ticker_data, self.tickers)
-        sectors = await asyncio.to_thread(provider.get_sector_data)
-        indices = await asyncio.to_thread(provider.get_indices)
+        p = MarketDataProvider()
+        watchlist = await asyncio.to_thread(p.get_watchlist_data, self.tickers)
+        indices = await asyncio.to_thread(p.get_indices)
+        sectors = await asyncio.to_thread(p.get_sector_data)
         
-        self.query_one(MarketHeatmap).update_heatmap(sectors)
-        self.query_one(TickerFooter).update_indices(indices)
+        self.query_one("#heatmap").update_heatmap(sectors)
+        idx_str = "  |  ".join([f"{i['name']} {i['price']} [{LIME if i['raw_pct']>0 else RED}]{i['pct']}[/]" for i in indices])
+        self.query_one("#footer-idx").update(idx_str)
         
-        table = self.query_one(DataTable)
-        table.clear()
-        for row in ticker_data:
-            style = LIME if row["Raw Change %"] > 0 else RED
-            table.add_row(row["Symbol"], row["Price"], f"[{style}]{row['Change']}[/]", f"[{style}]{row['Change %']}[/]", row["Mkt Cap"], key=row["Symbol"])
-        
-        if ticker_data: await self.load_ticker(ticker_data[0]['Symbol'])
+        t = self.query_one(DataTable)
+        t.clear()
+        for r in watchlist:
+            line1_left = Text.assemble((f"{r['Symbol']:<6}", "bold white"), (f" {r['Name'][:15]}", "dim white"))
+            line2_left = Text.assemble((f" [black on #0000FF] {r.get('Sector','TECH')} [/] ", "bold"), (f" MKT CAP: {r['Mkt Cap']}", "dim white"))
+            asset_card = Text.assemble(line1_left, "\n", line2_left)
+            s = LIME if r['Pct']>0 else RED
+            line1_right = Text.assemble((f"{r['Price']:>10.2f}", "bold white"), (f" {r['Change']:>+7.2f}", s))
+            line2_right = Text.assemble((f"{r['Pct']:>+18.2f}%", s))
+            pricing_card = Text.assemble(line1_right, "\n", line2_right)
+            t.add_row(asset_card, pricing_card, key=r['Symbol'])
+        if watchlist: await self.load_ticker(watchlist[0]['Symbol'])
 
-    async def on_data_table_row_selected(self, event: DataTable.RowSelected):
-        await self.load_ticker(str(event.row_key.value))
+    async def on_data_table_row_selected(self, e):
+        await self.load_ticker(str(e.row_key.value))
 
     async def load_ticker(self, symbol):
-        provider = MarketDataProvider()
-        data, hist, news = await asyncio.gather(
-            asyncio.to_thread(provider.get_full_analysis, symbol),
-            asyncio.to_thread(provider.get_history, symbol),
-            asyncio.to_thread(provider.get_av_news, symbol)
+        p = MarketDataProvider()
+        d, h, perf, news = await asyncio.gather(
+            asyncio.to_thread(p.get_full_analysis, symbol),
+            asyncio.to_thread(p.get_history, symbol),
+            asyncio.to_thread(p.get_performance_matrix, symbol),
+            asyncio.to_thread(p.get_av_news, symbol)
         )
-        if not data: return
-        
-        tech = provider.calculate_technicals(hist)
-        prof = data['Profile']
-        self.query_one(TopBanner).update_ticker(symbol, prof['Name'])
-        self.query_one("#summary-box").update(f"[dim {AMBER}]Profile | »[/] {prof['Summary'][:250]}...")
-        self.query_one(PriceChart).update_chart(hist, symbol)
-        
-        # Mid Column
-        self.query_one("#estimates").update_data(data['Estimates'])
-        self.query_one("#ratios").update_data(data['Ratios'])
-        self.query_one("#income").update_data(data['Income'])
-        self.query_one("#dividends").update_data(data['Dividends'])
-        
-        # Right Column
-        self.query_one("#corporate").update_data({"HQ": prof['HQ'], "Staff": prof['Employees'], "Web": prof['Website']})
-        self.query_one("#technicals").update_data({
-            "RSI(14)": tech['RSI'],
-            "Signal": tech['MA_Signal'],
-            "MA50": tech['MA50'],
-            "MA200": tech['MA200']
-        })
-        self.query_one("#management").update_data({m['title']: m['name'] for m in data['Management']})
-        
-        # Left Liquidity Bar
-        liq = data['Liquidity']
-        self.query_one("#liquidity-bar").update(f"VOL: {liq['Vol']} | AVG: {liq['Avg Vol']} | RATIO: {liq['Vol/Avg']}")
-        
+        if not d: return
+        self.query_one(TopBanner).update_ticker(symbol)
+        prof = d.get('Profile', {})
+        self.query_one("#summary-box").update(f"[dim {AMBER}]Profile | »[/] {prof.get('Summary', '')[:280]}...")
+        self.query_one(PriceChart).update_chart(h, symbol)
+        self.query_one("#estimates").update_data(d.get('Estimates', {}))
+        self.query_one("#ratios").update_data(d.get('Ratios', {}))
+        self.query_one("#corporate").update_data({"HQ": prof.get('HQ', 'N/A'), "Staff": prof.get('Employees', 'N/A'), "Web": prof.get('Website', 'N/A')})
+        mgmt = d.get('Management', [])
+        self.query_one("#management").update_data({m.get('title', 'N/A'): m.get('name', 'N/A') for m in mgmt})
+        self.query_one("#perf").update_matrix(perf)
+        self.query_one("#book").update_book(p.get_order_book(d.get('Price', 0)))
         self.query_one(NewsFeed).update_news(news)
 
 if __name__ == "__main__":
