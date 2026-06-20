@@ -1,0 +1,530 @@
+[
+  {
+    "id": 3967471,
+    "name": "Profitable Coffee Shop in Bangtao",
+    "url": "https://thailand.businessesforsale.com/thai/profitable-coffee-shop-in-bangtao.aspx",
+    "description": "A profitable coffee shop in Bang Tao is for sale. The premises are in perfect condition; it’s a ready-to-run, profitable business. It has been operating for over three years; all staff have been with...",
+    "location": {
+      "city": "Bang Tao",
+      "region": "Phuket",
+      "country": "Thailand"
+    },
+    "currency": "USD",
+    "financials": {
+      "asking_price": 200000.0,
+      "asking_price_raw": "$200,000",
+      "revenue": {
+        "min": 100000.0,
+        "max": 250000.0
+      },
+      "revenue_raw": "$100K - $250K",
+      "cash_flow": 70000.0,
+      "cash_flow_raw": "$70,000",
+      "multiple": 2.86
+    }
+  },
+  {
+    "id": 3965253,
+    "name": "Rhodes Restaurant With Liquor Licence",
+    "url": "https://australia.businessesforsale.com/australian/rhodes-restaurant-with-liquor-licence.aspx",
+    "description": "Prime restaurant opportunity in the heart of Rhodes, Sydney. Approx. 80sqm with fully equipped commercial kitchen, liquor licence, exhaust system, grease trap and long lease until May 2029 plus a...",
+    "location": {
+      "city": "Rhodes",
+      "region": "New South Wales",
+      "country": "Australia"
+    },
+    "currency": "AUD",
+    "financials": {
+      "asking_price": 130000.0,
+      "asking_price_raw": "$130,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3965267,
+    "name": "Cafe And Ice Cream Shop, South Edinburgh",
+    "url": "https://uk.businessesforsale.com/uk/cafe-and-ice-cream-shop-south-edinburgh.aspx",
+    "description": "Confidential sale of an attractive leasehold cafe and ice cream shop in an affluent south Edinburgh trading area.\r\nThe business is fully fitted and ready to trade, currently operated by the owners...",
+    "location": {
+      "city": "Edinburgh",
+      "region": "Edinburgh City",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 34950.0,
+      "asking_price_raw": "£34,950",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3967511,
+    "name": "Thriving Chicken And Ribs Takeaway In Aberdare",
+    "url": "https://uk.businessesforsale.com/uk/thriving-chicken-and-ribs-takeaway-in-aberdare.aspx",
+    "description": "Chicken and Ribs Takeaway for Sale Prime Town Centre Location (South Wales)\r\nChicken & Ribs Franchise for Sale – Prime Town Centre Location (South Wales)\r\nAn excellent opportunity to acquire a...",
+    "location": {
+      "city": "Aberdare",
+      "region": "Mid Glamorgan",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": {
+        "min": 100000.0,
+        "max": 200000.0
+      },
+      "asking_price_raw": "£100K - £200K",
+      "revenue": {
+        "min": 200000.0,
+        "max": 500000.0
+      },
+      "revenue_raw": "£200K - £500K",
+      "cash_flow": {
+        "min": 0,
+        "max": 50000.0
+      },
+      "cash_flow_raw": "Under £50K",
+      "multiple": 4.0
+    }
+  },
+  {
+    "id": 3967467,
+    "name": "Takeaway/fast Food With 1-bed Flat Above-for Sale–southend-on-sea, Essex",
+    "url": "https://uk.businessesforsale.com/uk/takeaway-fast-food-with-1-bed-flat-above-for-sale-southend-on-sea-essex.aspx",
+    "description": "Takeaway / Fast Food with 1 Bed Flat Above - For Sale - Southend-on-Sea, Essex.\nTurnover £2,500 - £3,000 (Mainly Staff Run)\r\nFully Fitted Throughout - Ideal for Any Cuisine.\nIdeal First Purchase -...",
+    "location": {
+      "city": "Southend-On-Sea",
+      "region": "Essex",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 49995.0,
+      "asking_price_raw": "£49,995",
+      "revenue": 156000.0,
+      "revenue_raw": "£156,000",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3951880,
+    "name": "Creams Dessert Restaurant (Cheltenham)",
+    "url": "https://uk.businessesforsale.com/uk/creams-dessert-restaurant-cheltenham.aspx",
+    "description": "Exceptional opportunity to acquire a fully operational and beautifully fitted Creams Café dessert restaurant in one of Cheltenham’s busiest trading locations.\r\nThis is a rare chance to take over a...",
+    "location": {
+      "city": "Cheltenham",
+      "region": "Gloucestershire",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 140000.0,
+      "asking_price_raw": "£140,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3967452,
+    "name": "Café/coffee Shop/grill – Full A3 Licence(2300)–for Sale–north London",
+    "url": "https://uk.businessesforsale.com/uk/cafe-coffee-shop-grill-full-a3-licence-2300-for-sale-north-london.aspx",
+    "description": "Café / Coffee Shop / Grill – Full A3 Licence (2300) – For Sale – North London.\nTurnover £3,000 Per Week – Trading Six Days 0700–1600.\nRent Only £14,400 Per Annum – Ideal First-Time Buyer Opportunity...",
+    "location": {
+      "city": "North London",
+      "region": "London",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 55000.0,
+      "asking_price_raw": "£55,000",
+      "revenue": 156000.0,
+      "revenue_raw": "£156,000",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3967171,
+    "name": "Prime Streats QSR Franchise Opportunity",
+    "url": "https://canada.businessesforsale.com/canadian/prime-streats-qsr-franchise-opportunity.aspx",
+    "description": "BUILD YOUR FUTURE WITH A PROVEN FRANCHISE OPPORTUNITY IN ALBERTA.\nAre you looking to own a business backed by an established brand, proven systems, and ongoing support?\r\nSTREATS Kitchen offers an...",
+    "location": {
+      "city": "confidential",
+      "region": "Alberta",
+      "country": "Canada"
+    },
+    "currency": "CAD",
+    "financials": {
+      "asking_price": 299000.0,
+      "asking_price_raw": "$299,000",
+      "revenue": null,
+      "revenue_raw": "Undisclosed",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3967099,
+    "name": "South Edmonton Bubble Tea Shop",
+    "url": "https://canada.businessesforsale.com/canadian/south-edmonton-bubble-tea-shop.aspx",
+    "description": "South Edmonton Bubble Tea Shop for Sale — Ellerslie ⭐**\r\nBe your own boss with this turnkey takeout business**\r\nOne-person operation** — Simple takeout model keeps staff & costs low.\nPerfect for...",
+    "location": {
+      "city": "Edmonton",
+      "region": "Alberta",
+      "country": "Canada"
+    },
+    "currency": "CAD",
+    "financials": {
+      "asking_price": {
+        "min": 0,
+        "max": 100000.0
+      },
+      "asking_price_raw": "Under $100K",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3965436,
+    "name": "Niche Bookstore Cafe - Melbourne",
+    "url": "https://australia.businessesforsale.com/australian/niche-bookstore-cafe-melbourne.aspx",
+    "description": "A newly established independent bookshop and café trading from a prominent position. Open seven days, the shop has built a loyal and passionate community around fictional titles across niche genres...",
+    "location": {
+      "city": "Melbourne",
+      "region": "Victoria",
+      "country": "Australia"
+    },
+    "currency": "AUD",
+    "financials": {
+      "asking_price": 150000.0,
+      "asking_price_raw": "$150,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3966980,
+    "name": "Cold Stone Creamery Owensboro, KY-South Frederica Retail Corridor",
+    "url": "https://us.businessesforsale.com/us/cold-stone-creamery-owensboro-ky-south-frederica-retail-corridor.aspx",
+    "description": "High-Volume Well-Established Cold Stone Creamery Owensboro, KY - South Frederica Retail Corridor!\r\nMinutes From The Newly Opened Maui's Owensboro Family Entertainment Center\"\r\nOffering the best...",
+    "location": {
+      "city": "Owensboro",
+      "region": "Kentucky",
+      "country": "US"
+    },
+    "currency": "USD",
+    "financials": {
+      "asking_price": 745000.0,
+      "asking_price_raw": "$745,000",
+      "revenue": 615556.0,
+      "revenue_raw": "$615,556",
+      "cash_flow": 226847.0,
+      "cash_flow_raw": "$226,847",
+      "multiple": 3.28
+    }
+  },
+  {
+    "id": 3966752,
+    "name": "Established Restaurant In Wolverhampton",
+    "url": "https://uk.businessesforsale.com/uk/established-restaurant-in-wolverhampton.aspx",
+    "description": "A fully equipped and operational restaurant & bar is available for sale in a prime location in Wolverhampton.\r\nCapacity for 45–50 customers.\nFully fitted commercial kitchen.\nAlcohol licence in place...",
+    "location": {
+      "city": "Wolverhampton",
+      "region": "West Midlands",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 60000.0,
+      "asking_price_raw": "£60,000",
+      "revenue": {
+        "min": 100000.0,
+        "max": 200000.0
+      },
+      "revenue_raw": "£100K - £200K",
+      "cash_flow": {
+        "min": 0,
+        "max": 50000.0
+      },
+      "cash_flow_raw": "Under £50K",
+      "multiple": 1.2
+    }
+  },
+  {
+    "id": 3966783,
+    "name": "Established Snack Van Business In Livingston",
+    "url": "https://uk.businessesforsale.com/uk/established-snack-van-business-in-livingston.aspx",
+    "description": "Established Snack Van Business for Sale – Prime Livingston Location.\nRare opportunity to purchase a long-established, fully equipped snack van business with an established trading site and vehicle...",
+    "location": {
+      "city": "Livingston",
+      "region": "West Lothian",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 55000.0,
+      "asking_price_raw": "£55,000",
+      "revenue": {
+        "min": 50000.0,
+        "max": 100000.0
+      },
+      "revenue_raw": "£50K - £100K",
+      "cash_flow": {
+        "min": 0,
+        "max": 50000.0
+      },
+      "cash_flow_raw": "Under £50K",
+      "multiple": 1.1
+    }
+  },
+  {
+    "id": 3965056,
+    "name": "Established Turnkey Café For Sale In Ottawa",
+    "url": "https://canada.businessesforsale.com/canadian/established-turnkey-cafe-for-sale-in-ottawa.aspx",
+    "description": "Established Café Business for Sale – Ottawa.\nRare opportunity to acquire a turnkey café in the heart of Ottawa.\r\nThis is a beautifully designed and fully operational café known for its unique menu...",
+    "location": {
+      "city": "Ottawa",
+      "region": "Ontario",
+      "country": "Canada"
+    },
+    "currency": "CAD",
+    "financials": {
+      "asking_price": 85000.0,
+      "asking_price_raw": "$85,000",
+      "revenue": {
+        "min": 100000.0,
+        "max": 250000.0
+      },
+      "revenue_raw": "$100K - $250K",
+      "cash_flow": {
+        "min": 50000.0,
+        "max": 100000.0
+      },
+      "cash_flow_raw": "$50K - $100K",
+      "multiple": 1.13
+    }
+  },
+  {
+    "id": 3964821,
+    "name": "Established Greek Dessert Food Trailer Business",
+    "url": "https://australia.businessesforsale.com/australian/established-greek-dessert-food-trailer-business.aspx",
+    "description": "Established Greek dessert business with food trailer, towing vehicle, event cart and custom marquee included. Strong brand, loyal customer base, proven event success and growth potential.",
+    "location": {
+      "city": null,
+      "region": "Victoria",
+      "country": "Australia"
+    },
+    "currency": "AUD",
+    "financials": {
+      "asking_price": 165000.0,
+      "asking_price_raw": "$165,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3964844,
+    "name": "Café In Canggu",
+    "url": "https://indonesia.businessesforsale.com/indonesian/cafe-in-canggu.aspx",
+    "description": "We are offering our fully set-up café concept, located in Canggu.\r\nA ready-to-run business with strong branding and a unique product concept introducing Indonesian martabak in a modern, elevated way...",
+    "location": {
+      "city": "Canggu",
+      "region": "Bali",
+      "country": "Indonesia"
+    },
+    "currency": "USD",
+    "financials": {
+      "asking_price": 30.0,
+      "asking_price_raw": "$30",
+      "revenue": {
+        "min": 0,
+        "max": 100000.0
+      },
+      "revenue_raw": "Under $100K",
+      "cash_flow": {
+        "min": 0,
+        "max": 50000.0
+      },
+      "cash_flow_raw": "Under $50K",
+      "multiple": 0.0
+    }
+  },
+  {
+    "id": 3965053,
+    "name": "Local Bar/Restaurant",
+    "url": "https://spain.businessesforsale.com/spanish/local-bar-restaurant-for-sale.aspx",
+    "description": "Here’s a strong, urgent-style advert you can use straight away on Facebook, WhatsApp groups, and business-for-sale sites.\r\nWriting.\nURGENT BUSINESS SALE – BAR & GRILL – COSTA BLANCA.\nEstablished Bar &...",
+    "location": {
+      "city": "Benijofar",
+      "region": "Alicante",
+      "country": "Spain"
+    },
+    "currency": "EUR",
+    "financials": {
+      "asking_price": {
+        "min": 100000.0,
+        "max": 250000.0
+      },
+      "asking_price_raw": "€100K - €250K",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": {
+        "min": 100000.0,
+        "max": 250000.0
+      },
+      "cash_flow_raw": "€100K - €250K",
+      "multiple": 1.43
+    }
+  },
+  {
+    "id": 3966622,
+    "name": "Fast Food Takeaway Shop",
+    "url": "https://uk.businessesforsale.com/uk/fast-food-takeaway-shop.aspx",
+    "description": "Fast food takeaway, not a franchise, right in the middle of town, near busy clubs, licence to open until 5 a.m. 7 days a week, ideal location, newly renovated. Most of the equipment purchased brand...",
+    "location": {
+      "city": "Cheltenham",
+      "region": "Gloucestershire",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 110000.0,
+      "asking_price_raw": "£110,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3955390,
+    "name": "Profitable Turnkey Café & Bakery with E-2 Potential",
+    "url": "https://us.businessesforsale.com/us/profitable-turnkey-cafe-and-bakery-with-e-2-potential.aspx",
+    "description": "Turnkey café and bakery opportunity located in the Metro Fort Myers market, fully equipped and ready for immediate operation. The business features a complete build-out including commercial kitchen...",
+    "location": {
+      "city": "Fort Myers",
+      "region": "Florida",
+      "country": "US"
+    },
+    "currency": "USD",
+    "financials": {
+      "asking_price": 120000.0,
+      "asking_price_raw": "$120,000",
+      "revenue": null,
+      "revenue_raw": "On request",
+      "cash_flow": null,
+      "cash_flow_raw": "On request",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3965344,
+    "name": "Fresh Flavours, Big Potential – Trendy Neighbourhood Deli & Cafe",
+    "url": "https://uk.businessesforsale.com/uk/fresh-flavours-big-potential-trendy-neighbourhood-deli-and-cafe-for-sale.aspx",
+    "description": "Open To Sensible Offers!\r\nCoGoGo is delighted to bring to the market a vibrant and modern deli cafe located in the heart of Wolverhampton. Trading as Della's Deli, this stylish food business has...",
+    "location": {
+      "city": "Wolverhampton",
+      "region": "West Midlands",
+      "country": "GB"
+    },
+    "currency": "GBP",
+    "financials": {
+      "asking_price": 34995.0,
+      "asking_price_raw": "£34,995",
+      "revenue": 49995.0,
+      "revenue_raw": "£49,995",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3966415,
+    "name": "Established Café/Bar In Los Cristianos",
+    "url": "https://spain.businessesforsale.com/spanish/established-cafe-bar-in-los-cristianos.aspx",
+    "description": "A well-positioned and fully refurbished café/bar is now available for sale in a prime area of Los Cristianos, one of the most sought-after locations in South Tenerife. This modern turnkey business...",
+    "location": {
+      "city": "Los Cristianos",
+      "region": "Tenerife",
+      "country": "Spain"
+    },
+    "currency": "EUR",
+    "financials": {
+      "asking_price": 165000.0,
+      "asking_price_raw": "€165,000",
+      "revenue": null,
+      "revenue_raw": "Undisclosed",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3966405,
+    "name": "Well-Established Shark’s Fish And Chicken Franchise Dekalb, IL",
+    "url": "https://us.businessesforsale.com/us/well-established-shark-s-fish-and-chicken-franchise-dekalb-il.aspx",
+    "description": "Well-Established Shark’s Fish & Chicken Franchise DeKalb, IL - Adjacent Northern Illinois University!\r\nHas Successfully Operated Within The DeKalb Market For Over 15 Years\"\r\nFantastic opportunity to...",
+    "location": {
+      "city": "DeKalb",
+      "region": "Illinois",
+      "country": "US"
+    },
+    "currency": "USD",
+    "financials": {
+      "asking_price": 79000.0,
+      "asking_price_raw": "$79,000",
+      "revenue": null,
+      "revenue_raw": "Undisclosed",
+      "cash_flow": null,
+      "cash_flow_raw": "Undisclosed",
+      "multiple": null
+    }
+  },
+  {
+    "id": 3956175,
+    "name": "New Wilsetti Pizzeria",
+    "url": "https://canada.businessesforsale.com/canadian/new-wilsetti-pizzeria-for-sale.aspx",
+    "description": "The Company:\r\nWe provide you with your own established Pizzeria and Expresso Bar business.\r\nOur franchises are priced from $120,000 to $1.5M, and can be acquired or franchised.\r\nThe Company is...",
+    "location": {
+      "city": "Toronto",
+      "region": "Ontario",
+      "country": "Canada"
+    },
+    "currency": "CAD",
+    "financials": {
+      "asking_price": 295000.0,
+      "asking_price_raw": "$295,000",
+      "revenue": 456000.0,
+      "revenue_raw": "$456,000",
+      "cash_flow": 184000.0,
+      "cash_flow_raw": "$184,000",
+      "multiple": 1.6
+    }
+  }
+]
