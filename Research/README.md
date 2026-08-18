@@ -1,6 +1,6 @@
 <div align="center">
 
-# Shariah-Compliant Quant Research Lab
+# Halal Quant Research Lab
 
 <p>
   <img src="https://img.shields.io/badge/Phase-1%20Research-0A66C2" alt="Phase 1 Research">
