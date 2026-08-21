@@ -74,10 +74,13 @@ Fifteen strategy concepts, grouped by the factor or structural mechanic they iso
 
 ### Quality & Balance Sheet Dynamics
 
-**1. Enterprise Value Cash Flow Yield (FCF/EV)**
+**1. Enterprise Value Cash Flow Yield (FCF/EV) ✅**
 
 - **Mechanics:** Rank stocks by Free Cash Flow to Enterprise Value. Pair with AAOIFI debt-to-market cap limits (`< 30%`) to isolate capital-efficient firms.
 - **White Paper Focus:** Measuring if leverage constraints naturally amplify the Quality Factor premium relative to the S&P 500.
+
+<img width="5919" height="8060" alt="image 258" src="https://github.com/user-attachments/assets/a245e8d2-5fed-4f84-beeb-5499ef78d89a" />
+
 
 **2. Return on Invested Capital (ROIC) Reinvestment Engine**
 
