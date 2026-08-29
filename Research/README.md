@@ -97,7 +97,8 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Testing long-term compounding persistence in capital-light sectors like SaaS, Healthcare, and MedTech.
 
 <div>
-<img width="280" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="" />
+<img width="250" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/15c953ad-e6fa-4cf7-80ea-0e80fedc177b" />
+
 
 **High-ROIC Compounding under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal ROIC Reinvestment, 2022–2024*
 
