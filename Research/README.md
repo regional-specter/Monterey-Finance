@@ -91,10 +91,22 @@ This is an internal exploratory note, not a finished proof and not a live-return
 <br clear="all">
 
 
-**2. Return on Invested Capital (ROIC) Reinvestment Engine**
+**2. Return on Invested Capital (ROIC) Reinvestment Engine ✅**
 
 - **Mechanics:** Screen for high ROIC (`> 15%`) and high reinvestment rates among low-debt equities.
 - **White Paper Focus:** Testing long-term compounding persistence in capital-light sectors like SaaS, Healthcare, and MedTech.
+
+<div>
+<img width="280" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="" />
+
+**High-ROIC Compounding under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal ROIC Reinvestment, 2022–2024*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. From late 2022 through 2024, a cap-weighted basket of AAOIFI-screened S&P 500 names with ROIC above 15% and high reinvestment rates returned 39.6% compound annual growth, versus 22.9% for the S&P 500 (SPY) and 27.4% for a Halal large-cap ETF (SPUS). The live rule pairs a hard ROIC floor with the top half of that pool by reinvestment rate and owns names in proportion to company size. Inside the high-ROIC pool, high reinvestment beat low reinvestment (43.2% vs 28.7% CAGR), which supports the compounding hypothesis more than ROIC quintiles alone. The book is still a Halal mega-cap tech/platform portfolio: technology plus communication services averaged about 82% of weight. A robustness sleeve limited to SaaS, Healthcare, and MedTech returned 27.6% CAGR—roughly in line with SPUS, not a clear upgrade over the broad compounder book.
+
+[Read the white paper](papers/02-roic-engine/whitepaper.pdf)
+</div>
+<br clear="all">
+
 
 **3. Financial Distress & Distress-Risk Factor (SC_risk)**
 

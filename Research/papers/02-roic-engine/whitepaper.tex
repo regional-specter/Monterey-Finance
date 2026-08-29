@@ -1,0 +1,560 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+\onehalfspacing
+\setlength{\parskip}{0.35em}
+\setlength{\parindent}{0pt}
+\setlist[itemize]{leftmargin=1.4em,itemsep=0.15em,topsep=0.25em}
+\setlist[enumerate]{leftmargin=1.4em,itemsep=0.15em,topsep=0.25em}
+\captionsetup{font=small,labelfont=bf,skip=6pt}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{0.5em}{}
+
+\newcommand{\lab}{Monterey Finance Halal Quant Research Lab}
+\newcommand{\strat}{Halal ROIC compounders}
+
+\title{%
+  High-ROIC Compounding under AAOIFI Debt Limits:\\
+  An Exploratory Backtest of Halal ROIC Reinvestment, 2022--2024}
+\author{\lab\\Paper 02 \textperiodcentered{} Exploratory note}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+This is an internal exploratory note, not a finished proof and not a live-return target.
+From 31~October~2022 through 30~December~2024, a cap-weighted basket of AAOIFI-screened S\&P~500 names with return on invested capital (ROIC) above 15\% and high reinvestment rates returned \textbf{39.6\%} compound annual growth, versus \textbf{22.9\%} for the S\&P~500 (SPY) and \textbf{27.4\%} for a Halal large-cap ETF (SPUS).
+The live rule pairs a hard ROIC floor with the top half of that pool by reinvestment rate---the ``reinvestment engine''---and weights by market cap.
+Inside the high-ROIC pool, the high-reinvestment half beat the low-reinvestment half (43.2\% vs 28.7\% CAGR), which supports the compounding hypothesis more than the ROIC quintiles alone (Q1 did not beat Q5 cleanly).
+The main book is still a Halal mega-cap tech/platform portfolio: technology plus communication services average about 82\% of GICS weight.
+A robustness sleeve restricted to SaaS, Healthcare, and MedTech returned 27.6\% CAGR---roughly in line with SPUS, not a clear upgrade over the broad compounder book.
+Yahoo annual statements and a short live window limit how much we can claim about long-run persistence in capital-light sectors.
+\end{abstract}
+
+\tableofcontents
+\vspace{1em}
+\noindent\textit{Status.} Exploratory. Reproduce from \texttt{code.ipynb}. Figures in \texttt{figures/}. Sharia screens are a hard point-in-time constraint, not an overlay.
+
+%----------------------------------------------------------------------
+\section{Hypothesis \& Theory}
+
+\subsection{What we are testing}
+
+The lab backlog item for this paper is return on invested capital (ROIC) paired with reinvestment rates among low-debt Halal equities~\cite{readme}.
+The economic claim is that AAOIFI leverage limits already remove highly indebted firms; among what remains, businesses that \textbf{earn a high return on capital and plough a large share of those earnings back into growth} should compound faster than the broad market---especially in capital-light sectors like SaaS, Healthcare, and MedTech where R\&D and intangible reinvestment matter more than plant and equipment.
+
+\begin{quote}
+After dropping banned businesses and names above the AAOIFI debt cap, do Halal companies with ROIC $> 15\%$ and high reinvestment rates hold up as a compounding book when owned in proportion to size?
+\end{quote}
+
+ROIC measures how hard each dollar of invested capital works: $\text{ROIC} = \text{NOPAT} / \text{Invested Capital}$, with NOPAT $=$ EBIT $\times (1 - \text{tax rate})$.
+Reinvestment rate measures how much of that NOPAT is put back into the business:
+\[
+\text{Reinvestment rate} = \frac{\text{CapEx} - \text{D\&A} + \Delta\text{NWC} + \text{R\&D}}{\text{NOPAT}}.
+\]
+R\&D is counted as reinvestment so capital-light software and med-tech names are not scored as ``low reinvestment'' simply because they spend little on factories.
+
+\subsection{Why ROIC and reinvestment might interact with Halal screens}
+
+AAOIFI financial screens cap interest-bearing debt, cash, and receivables relative to market value.
+In this test the debt rule is total debt below 30\% of trailing 24-month market cap, plus the library's cash and receivables screens.
+The hypothesis is that those caps leave a cleaner pool where return \emph{on} capital---not cheapness on capital---is more informative.
+
+We do \emph{not} claim that Halal screens create a ROIC premium by themselves.
+The live window is short, mega-cap-heavy, and partly overlaps the 2023--2024 AI/platform boom.
+The capital-light robustness sleeve is included to test whether SaaS / Healthcare / MedTech compounders persist; it is not the primary live rule.
+
+\subsection{Universe and screening standard}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Item & Choice \\
+\midrule
+Target factors & ROIC $> 15\%$; reinvestment rate in top half of that pool \\
+Starting universe & Current S\&P~500 list (503 tickers) \\
+After banned-business screen & 439 tickers (64 removed) \\
+Focus-sector tags (diagnostic) & SaaS 40, Healthcare 25, MedTech 33, Other 341 \\
+Screening standard & AAOIFI financial ratios, not DJIM \\
+Halal benchmark & SPUS (SP Funds S\&P~500 Sharia Industry Exclusions) \\
+All-stock benchmark & SPY (S\&P~500) \\
+Sample requested & 1~Jan~2019 -- 31~Dec~2024 \\
+First metrics date & 30~Nov~2021 \\
+Live window used for stats & 31~Oct~2022 -- 30~Dec~2024 (544 trading days) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Sector exclusions (banks, conventional insurance, alcohol, tobacco, gambling, weapons, and similar) run once on the current constituent list.
+Debt, cash, and receivables screens re-run at every month-end on point-in-time filings.
+ROIC and reinvestment come from yfinance annual statements with a 90-day publication lag.
+
+SPUS is the Halal \emph{index} comparison required by the lab template.
+It is an industry-exclusion ETF, cap-weighted, not identical to a pure AAOIFI financial-ratio index.
+
+Yahoo had no price history in-sample for Q, SNDK, and FDXF; BKR hit a cache lock once during download.
+They are skipped where data are missing.
+
+\subsection{What would count as a finished proof}
+
+This note would move from ``exploratory'' to ``ready for a live mandate'' only after: a frozen rule, ten to fifteen years of SEC income/cash-flow tags, point-in-time S\&P membership, a down year fully inside the live window, a sector-capped twin, and a hold-out window that was not used to tune thresholds.
+None of that is in this file.
+
+%----------------------------------------------------------------------
+\section{Strategy Rules}
+
+Rules are unambiguous and applied with no look-ahead.
+Compliance is a hard constraint: a name that fails on a rebalance date is not held.
+
+\subsection{Pipeline at each month-end}
+
+\begin{enumerate}
+  \item \textbf{Start} from the sector-eligible S\&P~500 list (439 names).
+  \item \textbf{Filter (AAOIFI).} Drop names that fail debt / 24-month market cap $< 30\%$, or the cash and receivables screens, using filings known as of that date (\texttt{filed\_date}, or report date plus 90 days).
+  \item \textbf{Score.} Compute ROIC and reinvestment rate from annual income, balance sheet, and cash-flow statements.
+  \item \textbf{Select.} Require ROIC $> 15\%$, positive NOPAT, positive invested capital, and reinvestment rate $> 0$.
+        Keep the top half of that Halal list by reinvestment rate (\texttt{KEEP\_QUANTILE} $= 0.50$).
+  \item \textbf{Weight.} Cap-weight by market cap. No equal-weight, no inverse-vol, no optimizer.
+  \item \textbf{Rebalance.} Repeat at month-end (\texttt{REBALANCE\_FREQ} $=$ \texttt{ME}).
+\end{enumerate}
+
+If fewer than 20 names survive (\texttt{MIN\_HOLDINGS}), that month is skipped and the book stays in cash (treated as missing, not as a 0\% return).
+Performance statistics start on the first day the strategy actually holds stocks, not on the 2019 start date.
+
+\subsection{Entry, exit, and risk limits}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Rule & Specification \\
+\midrule
+Entry & Halal + ROIC $> 15\%$ + positive reinvestment + top half by reinvestment \\
+Exit & Sold at the next month-end if the name fails AAOIFI, \\
+     & loses the ROIC/reinvestment test, or drops out of the top half \\
+Intra-month stop-loss & None \\
+Position cap & None beyond cap-weight \\
+Cash when thin & Skip the month if holdings $< 20$ \\
+Robustness twin & Same screen, then keep only SaaS / Healthcare / MedTech \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+There is no stop-loss and no single-name cap.
+At the last rebalance (31~Dec~2024) Nvidia was 20.4\%, Microsoft 19.0\%, and the two Alphabet share classes together were about 28.7\%.
+That is a concentrated mega-cap book by design.
+
+\subsection{Holdings through time}
+
+Median live book size is 51 names (min~5 early build, max~64).
+The funnel at a typical month is: about 418 names with fundamentals, 100 Halal with ROIC $> 15\%$ and positive reinvestment, 50 actually bought.
+About half of the high-ROIC pool sits in the tagged SaaS / Healthcare / MedTech buckets, but cap-weighting still leaves most weight in ``Other'' mega-caps.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/holdings-count.png}
+\caption{Number of names held at each month-end. The book ramps from a thin early window to a stable 50-name sleeve through 2024.}
+\label{fig:holdings}
+\end{figure}
+
+\subsection{Names that enter, stay, or leave}
+
+Sharia status, ROIC, and reinvestment rank are re-checked every month.
+A held name that fails is exited at that rebalance---not left in the book until a human review.
+
+On 31~Dec~2024 the watchlist split as follows:
+
+\begin{itemize}
+  \item \textbf{Held:} NVDA, MSFT, GOOGL, ADBE, LLY. All Halal-ok, all in the top half by reinvestment among the 99-name high-ROIC pool.
+  \item \textbf{Halal-ok but not bought:} AAPL (ROIC 57\% but reinvestment rank 58 of 99---a cash-rich harvester on this metric).
+  \item \textbf{Not bought --- ROIC floor:} ISRG, SYK, TMO, INTU, NOW, ORCL, and several other MedTech/SaaS names sat below 15\% ROIC on Yahoo filings despite strong reinvestment rates.
+  \item \textbf{Not bought --- negative reinvestment:} UNH and ABBV were cash harvesters that month (reinvestment rate below zero).
+\end{itemize}
+
+GOOG and GOOGL were both held as separate lines.
+Cap-weighting two share classes of the same company inflates Alphabet relative to a single-listing index.
+That is a construction bug to fix in a follow-up, not a feature.
+
+Many capital-light MedTech names failed the 15\% ROIC floor in this data.
+That is a central finding for the paper's original sector focus: the reinvestment engine \emph{worked} as a sort inside the high-ROIC pool, but MedTech did not dominate the book the way the backlog hypothesis suggested.
+
+%----------------------------------------------------------------------
+\section{Empirical Performance}
+
+All headline numbers use the \textbf{live window} only: 31~October~2022 through 30~December~2024 (544 trading days).
+Days before the first invested date are omitted, not filled with zeros.
+Yahoo's short annual statement history is why the book does not go live in 2019.
+
+\subsection{Headline results}
+
+\begin{table}[htbp]
+\centering
+\caption{Live-window performance, 31~Oct~2022 -- 30~Dec~2024. Sharpe and Sortino use a 2\% risk-free rate. Max drawdown is peak-to-trough on the growth curve.}
+\label{tab:perf}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Book & CAGR & Vol. & Sharpe & Sortino & Max DD & Calmar \\
+\midrule
+Halal ROIC compounders                    & 39.57\% & 19.48\% & 1.71 & 2.57 & $-15.33\%$ & 2.58 \\
+Compounders (SaaS / HC / MedTech)         & 27.61\% & 17.48\% & 1.37 & 1.97 & $-15.07\%$ & 1.83 \\
+S\&P~500 (SPY)                            & 22.94\% & 13.92\% & 1.41 & 2.13 & $-9.97\%$  & 2.30 \\
+Halal (SPUS)                              & 27.35\% & 16.20\% & 1.45 & 2.24 & $-11.46\%$ & 2.39 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The compounder book beat both required benchmarks on CAGR, Sharpe, Sortino, and Calmar.
+It took a deeper drawdown than SPY ($-15.3\%$ vs $-10.0\%$) and SPUS ($-11.5\%$).
+The capital-light robustness sleeve matched SPUS on CAGR (27.6\% vs 27.4\%) with similar drawdown---it did \textbf{not} beat the broad compounder book.
+
+These CAGRs are annualized figures from a mega-cap bull market.
+They are not a forecast of 40\% a year.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/equity-curves.png}
+\caption{Growth of \$1 in the live window. The main compounder book leads; the capital-light sleeve tracks closer to SPUS.}
+\label{fig:equity}
+\end{figure}
+
+\subsection{Calendar years}
+
+\begin{table}[htbp]
+\centering
+\caption{Calendar-year total returns inside the live window.}
+\label{tab:calendar}
+\begin{tabular}{lrrr}
+\toprule
+Year & Halal ROIC compounders & S\&P~500 & Halal (SPUS) \\
+\midrule
+2022 & $-2.28\%$ & $-1.24\%$ & $-1.64\%$ \\
+2023 & 56.67\% & 26.18\% & 34.20\% \\
+2024 & 34.16\% & 25.34\% & 27.67\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The compounder book led strongly in 2023 and 2024.
+2022 is only a partial year (live from late October) and all books were slightly negative in that stub.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/calendar-year-returns.png}
+\caption{Calendar-year returns. The compounder book is the tallest bar in 2023 and 2024.}
+\label{fig:calendar}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/rolling-excess.png}
+\caption{Rolling 12-month excess return versus SPY. Excess stayed positive through most of the live window.}
+\label{fig:excess}
+\end{figure}
+
+\subsection{Drawdowns}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/drawdowns.png}
+\caption{Drawdowns in the live window. The compounder book dips with Halal/tech names and takes a deeper trough than SPY in mid/late 2024.}
+\label{fig:dd}
+\end{figure}
+
+The compounder book and SPUS move together in late 2023 and 2024.
+SPY's drawdowns are shallower.
+That is consistent with a Halal mega-cap platform book, not with a defensive quality sleeve.
+
+\subsection{Does higher ROIC actually compound?}
+
+Two cuts inside the Halal universe test the factor logic.
+
+\paragraph{ROIC quintiles.}
+Cap-weight five buckets by ROIC.
+Q1 is the highest ROIC; Q5 is the lowest.
+
+\begin{table}[htbp]
+\centering
+\caption{Cap-weighted ROIC quintiles inside the Halal universe, live window. Q1 $=$ highest ROIC.}
+\label{tab:quintiles}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Bucket & CAGR & Vol. & Sharpe & Sortino & Max DD & Calmar \\
+\midrule
+Q1 & 27.09\% & 18.92\% & 1.26 & 1.81 & $-13.98\%$ & 1.94 \\
+Q2 & 33.81\% & 16.99\% & 1.68 & 2.44 & $-12.61\%$ & 2.68 \\
+Q3 & 16.85\% & 14.17\% & 1.03 & 1.55 & $-14.86\%$ & 1.13 \\
+Q4 & 26.23\% & 18.27\% & 1.26 & 1.86 & $-16.25\%$ & 1.61 \\
+Q5 & 18.90\% & 17.40\% & 0.97 & 1.46 & $-12.89\%$ & 1.47 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The pattern is \textbf{not} monotonic: Q2 beat Q1, and Q4 beat Q5.
+Q1$-$Q5 annualized spread was 6.9\%, with Q1 beating Q5 on 52.4\% of days.
+ROIC alone is a noisy sort in this window.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/quintile-growth.png}
+\caption{Growth of \$1 by ROIC quintile. Q2 leads; Q3 lags.}
+\label{fig:qgrowth}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/quintile-spread.png}
+\caption{Cumulative Q1 minus Q5 spread. The line ends above 1 but is noisy---not a clean stair-step quality premium.}
+\label{fig:qspread}
+\end{figure}
+
+\paragraph{Reinvestment split among high-ROIC names.}
+Hold ROIC $> 15\%$ fixed and split the pool at the median reinvestment rate.
+This is the compounding hypothesis the live rule implements.
+
+\begin{table}[htbp]
+\centering
+\caption{Reinvestment split inside the Halal ROIC$>15\%$ pool, live window, cap-weighted.}
+\label{tab:reinv}
+\small
+\begin{tabular}{lrrrrrr}
+\toprule
+Sleeve & CAGR & Vol. & Sharpe & Sortino & Max DD & Calmar \\
+\midrule
+High ROIC + high reinvestment & 43.18\% & 19.34\% & 1.85 & 2.74 & $-15.33\%$ & 2.82 \\
+High ROIC + low reinvestment  & 28.71\% & 14.23\% & 1.70 & 2.88 & $-11.45\%$ & 2.51 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+High reinvestment beat low reinvestment by 14.5 points of CAGR---stronger evidence than the quintile sort.
+The live book targets the high-reinvestment half and lands near this sleeve by construction.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/reinvestment-split.png}
+\caption{High vs low reinvestment, holding ROIC $> 15\%$ fixed. The high-reinvestment sleeve pulls ahead through 2023--2024.}
+\label{fig:reinv}
+\end{figure}
+
+%----------------------------------------------------------------------
+\section{Factor Attribution}
+
+Section~3 shows the book won.
+This section asks whether that win is stock picking or a hidden sector bet---especially the SaaS / Healthcare / MedTech tilt the backlog named.
+
+\subsection{Alpha, beta, tracking error}
+
+Daily excess returns of the compounder book are regressed on each benchmark (CAPM-style, 2\% risk-free rate).
+Alpha is annualized.
+
+\begin{table}[htbp]
+\centering
+\caption{Halal ROIC compounders versus each benchmark, live window.}
+\label{tab:capm}
+\begin{tabular}{lrrrrr}
+\toprule
+Benchmark & Alpha (ann.) & Beta & $R^2$ & Tracking error & Info.\ ratio \\
+\midrule
+S\&P~500     & 10.00\% & 1.18 & 0.72 & 10.68\% & 1.28 \\
+Halal (SPUS) & 8.06\%  & 1.07 & 0.80 & 8.89\%  & 1.10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Versus SPY the book is more aggressive ($\beta = 1.18$) with 10.0\% leftover annualized alpha.
+Versus SPUS it is almost a parallel book: $\beta = 1.07$, $R^2 = 0.80$, still 8.1\% alpha.
+In plain language: \textbf{this is an SPUS-like Halal large-cap book with extra mega-cap platform exposure}, not an independent style that wiggles on its own.
+
+The information ratios (1.28 vs SPY, 1.10 vs SPUS) look respectable because the sample includes two strong years.
+They will shrink if a full down year like 2022 is added.
+
+\subsection{Focus-sector and GICS exposure delta}
+
+Average month-end weights of the cap-weighted compounder book are compared with an equal-weight basket of the Halal S\&P universe.
+
+\begin{table}[htbp]
+\centering
+\caption{Average focus-bucket weights. Delta $=$ compounder book minus equal-weight Halal universe.}
+\label{tab:focus}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Bucket & Compounder book & Halal universe (EW) & Delta \\
+\midrule
+Other                      & 73.7\% & 77.7\% & $-4.0\%$ \\
+SaaS                       & 16.6\% & 9.1\%  & $+7.5\%$ \\
+Healthcare                 & 9.4\%  & 5.7\%  & $+3.7\%$ \\
+MedTech                    & 2.0\%  & 7.5\%  & $-5.5\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+SaaS and Healthcare are overweights, but MedTech is an \textbf{underweight}.
+Cap-weighting Nvidia, Microsoft, Alphabet, and Meta leaves ``Other'' at 74\% despite many tagged names in the high-ROIC pool.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/focus-mix.png}
+\caption{Focus mix: compounder book vs equal-weight Halal universe. MedTech is lighter than the universe, not heavier.}
+\label{fig:focus}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Average GICS sector weights. Delta $=$ compounder book minus equal-weight Halal universe.}
+\label{tab:sectors}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Sector & Compounder book & Halal universe (EW) & Delta \\
+\midrule
+Technology                 & 44.6\% & 19.1\% & $+25.5\%$ \\
+Communication services     & 37.8\% & 5.5\%  & $+32.4\%$ \\
+Healthcare                 & 9.7\%  & 13.4\% & $-3.8\%$ \\
+Consumer cyclical          & 6.8\%  & 11.6\% & $-4.8\%$ \\
+Consumer defensive         & 5.5\%  & 6.4\%  & $-0.9\%$ \\
+Energy                     & 2.7\%  & 4.8\%  & $-2.1\%$ \\
+Industrials                & 1.9\%  & 14.4\% & $-12.4\%$ \\
+Basic materials            & 1.1\%  & 4.6\%  & $-3.4\%$ \\
+Utilities                  & 0.0\%  & 7.1\%  & $-7.1\%$ \\
+Real estate                & 0.0\%  & 6.8\%  & $-6.8\%$ \\
+Financial services         & 0.0\%  & 6.2\%  & $-6.2\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Technology plus communication services average \textbf{82.4\%} of the book---even more concentrated than Paper~01's FCF-quality book.
+Utilities, real estate, and financial services are empty.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/sector-mix.png}
+\caption{GICS sector mix: compounder book vs equal-weight Halal universe. The book is a platform/tech overweight, not a diversified capital-light healthcare book.}
+\label{fig:sectors}
+\end{figure}
+
+\subsection{What we can and cannot isolate}
+
+The leftover alpha versus SPUS is still positive after a $\beta \approx 1$ fit, so the result is not \emph{only} ``we owned SPUS.''
+But SPUS itself is already Halal and tech-tilted in this window, and our book is more concentrated in the same mega-cap platform names.
+
+The reinvestment split supports the \emph{engine} part of the hypothesis: among high-ROIC Halal names, ploughing capital back in paid in 2022--2024.
+The \emph{sector} part is weaker: MedTech did not dominate, and the SaaS/HC/MedTech-only sleeve did not beat the main book.
+
+Without a sector-neutral twin we cannot say how much of the 8\% SPUS alpha is reinvestment sorting versus ``even more Nvidia/Microsoft/Alphabet/Meta than SPUS.''
+
+The honest attribution: \textbf{reinvestment sorting inside a Halal high-ROIC pool produced a mega-cap platform book, and that book paid in 2022--2024.}
+
+%----------------------------------------------------------------------
+\section{Limitations \& Friction}
+
+\subsection{Turnover, slippage, and net CAGR}
+
+Turnover is one-way: half the $\ell_1$ weight change between consecutive month-end books.
+Trading-cost drag assumes 10~basis points per one-way turn.
+
+\begin{table}[htbp]
+\centering
+\caption{Implementation friction on the live compounder book.}
+\label{tab:friction}
+\begin{tabular}{lr}
+\toprule
+Item & Value \\
+\midrule
+Rebalances with holdings              & 27 \\
+Average names held                    & 47.6 \\
+Annualized one-way turnover           & 200.2\% \\
+Assumed cost per one-way trade        & 10~bp \\
+Estimated annual trading-cost drag    & 0.20\% \\
+CAGR gross of trading costs           & 39.57\% \\
+CAGR net of trading costs             & 39.24\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Annualized one-way turnover of 200\% looks high because the book ramps from a thin early window and rebalances monthly across ~50 names.
+Cost drag at 10~bp is 20~bp a year---small next to the headline CAGR, but real slippage on smaller reinvestment picks could be wider.
+We did not model market impact, borrow, or taxes.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/turnover.png}
+\caption{One-way turnover at each rebalance. Spikes appear when the book expands; steady-state months are lower but not negligible.}
+\label{fig:turnover}
+\end{figure}
+
+\subsection{Purification drag}
+
+Impure income that may require purification is reported, not ignored.
+Using the library's dividend-purification helper on names that appeared in the book: \textbf{213 dividend events while held}, annualized purification drag $\approx \mathbf{0.00\%}$.
+That is negligible next to 39.6\% CAGR.
+Missing interest-income tags are a gap, not a 0\% drag.
+
+\subsection{Point-in-time compliance and exits}
+
+Screens are applied at each rebalance.
+Failed names are sold then.
+There is no intra-month compliance monitor.
+
+Sector exclusions use the \emph{current} S\&P list and current activity labels, not the 2019 membership file.
+That is survivorship and look-ahead in the universe, even though filings themselves use \texttt{filed\_date}.
+
+\subsection{Data and construction issues}
+
+\begin{itemize}
+  \item \textbf{Short statement history.} Yahoo annual statements typically store a few years. First metrics date is 30~Nov~2021; first invested date is 31~Oct~2022. The 2019--2021 request is mostly unused.
+  \item \textbf{ROIC quality.} NOPAT, invested capital, CapEx, D\&A, $\Delta$NWC, and R\&D come from yfinance with a 90-day lag. Restatements and tag mapping are not audited here. Names with ROIC above 500\% are dropped as denominator errors.
+  \item \textbf{Share-class double count.} GOOG and GOOGL are both weighted. Alphabet is overweight versus a single-listing index.
+  \item \textbf{No position cap.} Three names can be half the book. A 5\% or 8\% cap would change both risk and 2023--2024 return.
+  \item \textbf{MedTech ROIC floor.} Many med-tech names failed the 15\% ROIC threshold on Yahoo data despite high reinvestment. Sector persistence cannot be read from weights alone.
+  \item \textbf{15\% ROIC threshold.} Fixed before the full run; not optimized on a hold-out, but the live window is short.
+\end{itemize}
+
+\subsection{What this note does not show}
+
+There is no full calendar year 2022, no 2008, no rate-hike recession, and no hold-out after the rule freeze.
+ROIC quintiles are not monotonic.
+Sector delta explains a large part of the path.
+Beating SPUS in a mega-cap boom is interesting; it is not evidence that Halal ROIC compounders persist across cycles in capital-light sectors---the original backlog question.
+
+\subsection{Decision}
+
+\textbf{Follow-up, do not kill, do not promote to a live book.}
+
+Keep the idea: Halal + high ROIC + high reinvestment + cap-weight is a coherent product shape, and the reinvestment split supports the engine logic more than ROIC quintiles alone.
+Before a second paper, freeze the rule and add (i)~SEC income/cash-flow tags with a longer history, (ii)~point-in-time S\&P members, (iii)~a single listing per issuer, (iv)~a sector-capped or MedTech-inclusive twin with a ROIC definition tuned for R\&D-heavy filers, and (v)~at least one full down year.
+If the sector-capped twin still beats SPUS, the compounding claim gets teeth.
+If it does not, this note's 40\% is mostly the 2023--2024 platform tape---similar to Paper~01.
+
+\bigskip
+\noindent\textit{Reproduction.} Notebook \path{Research/papers/02-roic-engine/code.ipynb} with \texttt{FAST\_MODE=False}, 2019-01-01 to 2024-12-31. Figures in \texttt{figures/}.
+
+\begin{thebibliography}{9}
+\bibitem{aaoifi21}
+AAOIFI, ``Financial Paper (Shares and Bonds),'' Shari'ah Standard No.~21, Accounting and Auditing Organization for Islamic Financial Institutions.
+
+\bibitem{readme}
+Monterey Finance, ``Halal Quant Research Lab,'' \texttt{Research/README.md}, Phase~1 standardized white-paper structure.
+\end{thebibliography}
+
+\end{document}
