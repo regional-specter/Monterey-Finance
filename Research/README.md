@@ -80,7 +80,8 @@ Fifteen strategy concepts, grouped by the factor or structural mechanic they iso
 - **White Paper Focus:** Measuring if leverage constraints naturally amplify the Quality Factor premium relative to the S&P 500.
 
 <div>
-<img width="280" align="left" alt="Cash Generation under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/a245e8d2-5fed-4f84-beeb-5499ef78d89a" />
+<img width="280" align="left" alt="Cash Generation under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/e24b5c6d-a385-4215-abd3-547ff25b325e" />
+
 
 **Cash Generation under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal FCF Quality, 2023–2024*
 
@@ -97,7 +98,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Testing long-term compounding persistence in capital-light sectors like SaaS, Healthcare, and MedTech.
 
 <div>
-<img width="250" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/15c953ad-e6fa-4cf7-80ea-0e80fedc177b" />
+<img width="280" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/80d3beec-cf9d-43cc-9a7f-b3eafe849700" />
 
 
 **High-ROIC Compounding under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal ROIC Reinvestment, 2022–2024*
