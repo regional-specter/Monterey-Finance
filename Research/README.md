@@ -123,7 +123,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Evaluating drawdown protection during market crashes when speculative, highly leveraged momentum turnarounds are pre-filtered out.
 
 <div>
-<img width="280" align="left" alt="Dual-Momentum Regime Switching under Halal Screens white paper" src="" />
+<img width="280" align="left" alt="Dual-Momentum Regime Switching under Halal Screens white paper" src="https://github.com/user-attachments/assets/34d8bd2f-b2ec-4a9e-a308-37ef2478689c" />
 
 
 **Dual-Momentum Regime Switching under Halal Screens:** *An Exploratory Backtest of 12–1 Relative Strength and a 200-Day SMA Overlay, 2019–2024*
