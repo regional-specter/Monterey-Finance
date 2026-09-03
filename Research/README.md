@@ -117,10 +117,23 @@ This is an internal exploratory note, not a finished proof and not a live-return
 
 ### Momentum, Trend & Style Rotation
 
-**4. Dual-Momentum Regime Switching**
+**4. Dual-Momentum Regime Switching ✅**
 
 - **Mechanics:** Combine 12-1 month relative price strength with a 200-day Simple Moving Average (SMA) absolute trend rule for market entry/exit.
 - **White Paper Focus:** Evaluating drawdown protection during market crashes when speculative, highly leveraged momentum turnarounds are pre-filtered out.
+
+<div>
+<img width="280" align="left" alt="Dual-Momentum Regime Switching under Halal Screens white paper" src="" />
+
+
+**Dual-Momentum Regime Switching under Halal Screens:** *An Exploratory Backtest of 12–1 Relative Strength and a 200-Day SMA Overlay, 2019–2024*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. From late 2019 through 2024, a cap-weighted basket of AAOIFI-screened S&P 500 names in the top quintile by 12–1 month relative strength versus SPY, held only when SPY was above its 200-day SMA, returned 18.8% compound annual growth, versus 14.8% for the S&P 500 (SPY) and 17.8% for a Halal large-cap ETF (SPUS). Maximum drawdown was −15.4%, roughly half the troughs of SPY (−33.7%) and SPUS (−30.8%). The SMA overlay is the main driver: the same momentum screen without the regime filter returned only 13.4% CAGR with a −30.2% drawdown. Dual momentum led in 2020 and limited 2022 losses to −5.5% while SPUS fell −22.8%; it lagged SPUS in the strong bull years 2021, 2023, and 2024. Relative-momentum quintiles inside the Halal pool are not monotonic—Q2 beat Q1—so the live edge looks more like regime timing than a clean relative-strength premium.
+
+[Read the white paper](papers/04-dual-momentum-reg-switch/whitepaper.pdf)
+</div>
+<br clear="all">
+
 
 **5. High-Beta Acceleration in Low-Debt Tech**
 
