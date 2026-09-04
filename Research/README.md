@@ -141,7 +141,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Measuring downside capture vs. upside participation when running high-beta growth strategies without leverage risk.
 
 <div>
-<img width="280" align="left" alt="High-Beta Acceleration in Low-Debt Tech white paper" src="papers/05-high-beta/figures/equity-curves.png" />
+<img width="280" align="left" alt="High-Beta Acceleration in Low-Debt Tech white paper" src="https://github.com/user-attachments/assets/9fca6ced-8d76-41da-8ec8-3b99eef67224" />
 
 
 **High-Beta Acceleration in Low-Debt Tech:** *An Exploratory Backtest of Upside Participation versus Downside Capture under AAOIFI Screens, 2020–2025*
