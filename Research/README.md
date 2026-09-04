@@ -135,10 +135,23 @@ This is an internal exploratory note, not a finished proof and not a live-return
 <br clear="all">
 
 
-**5. High-Beta Acceleration in Low-Debt Tech**
+**5. High-Beta Acceleration in Low-Debt Tech ✅**
 
 - **Mechanics:** Target top-quintile Beta stocks specifically in technology and clean energy, rebalanced monthly.
 - **White Paper Focus:** Measuring downside capture vs. upside participation when running high-beta growth strategies without leverage risk.
+
+<div>
+<img width="280" align="left" alt="High-Beta Acceleration in Low-Debt Tech white paper" src="papers/05-high-beta/figures/equity-curves.png" />
+
+
+**High-Beta Acceleration in Low-Debt Tech:** *An Exploratory Backtest of Upside Participation versus Downside Capture under AAOIFI Screens, 2020–2025*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. From early 2020 through 2025, a cap-weighted basket of AAOIFI-screened technology and clean-energy names in the top quintile by trailing beta versus SPY returned 34.9% compound annual growth, versus 15.1% for the S&P 500 (SPY) and 17.7% for a Halal large-cap ETF (SPUS). An equal-weight Halal tech sleeve (no beta tilt) returned 20.3% CAGR, so the beta sort itself adds about 15 percentage points in this sample. The cost is risk: 43.4% volatility and a −48.8% maximum drawdown. Upside capture versus SPY is 1.90 and downside capture is 1.80—acceleration with only a mildly positive capture spread. Portfolio debt stays well under 5% while portfolio beta runs about 1.7–2.2. Beta quintiles are not monotonic (Q5 leads; Q3 beats Q1/Q2/Q4), and the book is mega-cap concentrated.
+
+[Read the white paper](papers/05-high-beta/High-Beta%20Acceleration%20in%20Low-Debt%20Tech.pdf)
+</div>
+<br clear="all">
+
 
 **6. Earnings Momentum & Earnings Surprise (SUE)**
 
