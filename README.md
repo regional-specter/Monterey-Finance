@@ -1,6 +1,11 @@
+<div align="center">
+<img width="1920" height="540" alt="Monterey" src="https://github.com/user-attachments/assets/0d458c16-9d00-4330-b31d-7f2b90d4d739" />
+
 # **Monterey Finance**
 
 Monterey-Finance is a quantitative research project focused on designing, testing, and comparing investment strategies for a pool of Sharia-compliant stocks. All work in the first phase is grounded in historical market data, with strategies evaluated through backtests before any live trading is considered.
+
+</div>
 
 ## **Project Phases**
 
