@@ -1,0 +1,24 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{monterey}[2026/09/09 Monterey Finance first-page header]
+
+\RequirePackage{graphicx}
+\RequirePackage{eso-pic}
+
+\newcommand{\MontereyWatermarkFile}{../../assets/Watermark.png}
+
+% Place the branded banner on the first page only, flush to the top-left
+% margin so the PNG gradient fades into the page.
+\newcommand{\MontereyPlaceHeader}{%
+  \AddToShipoutPictureBG*{%
+    \AtPageUpperLeft{%
+      \raisebox{\dimexpr-\height-0.20in\relax}{%
+        \hspace*{0.18in}%
+        \includegraphics[width=7.15in,keepaspectratio]{\MontereyWatermarkFile}%
+      }%
+    }%
+  }%
+}
+
+\AtBeginDocument{\MontereyPlaceHeader}
+
+\endinput
