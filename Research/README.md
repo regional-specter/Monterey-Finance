@@ -1,4 +1,5 @@
 <div align="center">
+<img width="2477" height="449" alt="Banner 5" src="https://github.com/user-attachments/assets/52026cf0-28ac-45b8-b3b0-3846e583a121" />
 
 # Halal Quant Research Lab
 
