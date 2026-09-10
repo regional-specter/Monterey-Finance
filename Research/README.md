@@ -81,7 +81,7 @@ Fifteen strategy concepts, grouped by the factor or structural mechanic they iso
 - **White Paper Focus:** Measuring if leverage constraints naturally amplify the Quality Factor premium relative to the S&P 500.
 
 <div>
-<img width="280" align="left" alt="Cash Generation under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/e24b5c6d-a385-4215-abd3-547ff25b325e" />
+<img width="280" align="left" alt="Cash Generation under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/10170eff-6032-4f63-84d6-94cd07e80393" />
 
 
 **Cash Generation under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal FCF Quality, 2023–2024*
@@ -99,7 +99,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Testing long-term compounding persistence in capital-light sectors like SaaS, Healthcare, and MedTech.
 
 <div>
-<img width="280" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/80d3beec-cf9d-43cc-9a7f-b3eafe849700" />
+<img width="280" align="left" alt="High-ROIC Compounding under AAOIFI Debt Limits white paper" src="https://github.com/user-attachments/assets/72ad4aa8-49af-4ca7-b2b1-95c118151dfe" />
 
 
 **High-ROIC Compounding under AAOIFI Debt Limits:** *An Exploratory Backtest of Halal ROIC Reinvestment, 2022–2024*
@@ -124,7 +124,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Evaluating drawdown protection during market crashes when speculative, highly leveraged momentum turnarounds are pre-filtered out.
 
 <div>
-<img width="280" align="left" alt="Dual-Momentum Regime Switching under Halal Screens white paper" src="https://github.com/user-attachments/assets/34d8bd2f-b2ec-4a9e-a308-37ef2478689c" />
+<img width="280" align="left" alt="Dual-Momentum Regime Switching under Halal Screens white paper" src="https://github.com/user-attachments/assets/e9aa70d3-7b44-473d-956c-a41fde58a74f" />
 
 
 **Dual-Momentum Regime Switching under Halal Screens:** *An Exploratory Backtest of 12–1 Relative Strength and a 200-Day SMA Overlay, 2019–2024*
@@ -142,7 +142,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Measuring downside capture vs. upside participation when running high-beta growth strategies without leverage risk.
 
 <div>
-<img width="280" align="left" alt="High-Beta Acceleration in Low-Debt Tech white paper" src="https://github.com/user-attachments/assets/9fca6ced-8d76-41da-8ec8-3b99eef67224" />
+<img width="280" align="left" alt="High-Beta Acceleration in Low-Debt Tech white paper" src="https://github.com/user-attachments/assets/1216fbbf-101b-454f-bb7f-7ab52d9b6a41" />
 
 
 **High-Beta Acceleration in Low-Debt Tech:** *An Exploratory Backtest of Upside Participation versus Downside Capture under AAOIFI Screens, 2020–2025*
@@ -154,13 +154,14 @@ This is an internal exploratory note, not a finished proof and not a live-return
 <br clear="all">
 
 
+
 **6. Earnings Momentum & Earnings Surprise (SUE) ✅**
 
 - **Mechanics:** Screen for Standardized Unanticipated Earnings (SUE) where actual EPS exceeds analyst consensus by `> 2σ`.
 - **White Paper Focus:** Post-Earnings Announcement Drift (PEAD) efficacy in Halal equities vs. broad index constituents.
 
 <div>
-<img width="280" align="left" alt="Post-Earnings Announcement Drift under AAOIFI Screens white paper" src="" />
+<img width="280" align="left" alt="Post-Earnings Announcement Drift under AAOIFI Screens white paper" src="https://github.com/user-attachments/assets/48d679b5-15c7-4bd4-8f00-0ab7d985f8ee" />
 
 
 **Post-Earnings Announcement Drift under AAOIFI Screens:** *An Exploratory Backtest of Halal Earnings Surprise, 2020–2025*
