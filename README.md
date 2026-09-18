@@ -3,44 +3,50 @@
 
 # Monterey Finance
 
-Monterey-Finance is a quantitative research project focused on designing, testing, and comparing investment strategies for a pool of Sharia-compliant stocks. All work in the first phase is grounded in historical market data, with strategies evaluated through backtests before any live trading is considered.
+Monterey Finance builds a **Halal equity book that aims to grow steadily** — clear Sharia screens, controlled risk, and compounding over time. Phase 1 stays on historical data only. No live capital is deployed until the research book is good enough to run.
 
 </div>
 
-## **Project Phases**
+## Product goal
 
-### **Phase 1: Quantitative Research**
+**Grow steadily.** We are not chasing the highest possible return versus SPUS or the S&P 500. Success means a Halal portfolio that compounds with acceptable drawdowns, real purification accounting, and rules we could actually operate.
 
-Phase 1 is research only, and no live capital will be deployed during this stage. The main tasks are to define the Sharia-compliant stock universe, build quantitative trading and investment strategies for that universe, backtest each strategy against real historical market data, and measure and compare strategy performance.
+## Project phases
 
-Phase 1 deliverables include a documented stock universe with compliance rules applied, one or more strategy definitions with clear entry, exit, and risk rules, backtest results with standard performance metrics, and a written summary of findings and limitations.
+### Phase 1: Research (active)
 
-### **Phase 2: Fund Operations (Future)**
+Phase 1 has two parts:
 
-Phase 2 is not in scope for the current work, but it may eventually include live portfolio management, investor operations, and regulatory setup similar to a hedge fund. This phase will only be considered after Phase 1 research produces acceptable and repeatable results.
+1. **Factor discovery (mostly done)** — test single strategies inside an AAOIFI-screened universe; keep, revise, or kill each idea.
+2. **Fund book design (next)** — combine the sleeves that worked, set risk and concentration rules, and define Halal ops (breach exits, purification, costs).
 
-## **Research Scope**
+Deliverables: a documented Halal universe, a candidate multi-strategy book with clear rules, backtests vs Halal and all-stock benchmarks, and a written go / no-go for Phase 2.
 
-### **Stock Universe**
+Details and paper backlog live in [`Research/README.md`](Research/README.md).
 
-The project considers only stocks that pass Sharia compliance screens, which may include sector filters to remove non-permissible business activities and financial ratio limits on debt, cash, and receivables relative to market value. Compliance rules must be applied at each point in time during a backtest, meaning a stock that fails a screen on a given date must not be held on that date.
+### Phase 2: Fund operations (future)
 
-### **Strategy Development**
+Live portfolio management, brokerage, investor ops, and regulatory setup. Only after Phase 1 produces a book we would trust with capital.
 
-Strategies are rule-based and quantitative, and each strategy must define how stocks are selected from the compliant universe, when to open and close positions, and how position sizing and risk limits are applied. All strategies must be testable on historical data without look-ahead bias.
+## What we already learned
 
-### **Backtesting**
+- **Quality and momentum-style sleeves** (cash generation, ROIC, regime filters, selective earnings surprise) can work in this Halal universe.
+- **Deep value and high-dividend hunts** lagged badly in our sample — they fight the Halal mega-cap growth core. Those lines are paused, not the next priority.
+- A lot of single-strategy “alpha” was sector and mega-cap tilt. The next work is **how we combine and constrain the book**, not hunting a fifteenth factor.
 
-Backtests use real historical price and fundamental data, and each backtest must use point-in-time compliance status for each stock, account for stocks that enter or leave the universe over time, and report net return, drawdown, volatility, and risk-adjusted measures where the data allows. These results are used to compare strategies and determine whether further work is justified.
+## Compliance principles
 
-## **Compliance Principles**
+Sharia compliance is a hard constraint. Banned businesses and AAOIFI-style financial ratios are applied point-in-time. If a held name fails, there is a defined exit. Impure income that may need purification is reported, not ignored.
 
-Sharia compliance is a hard constraint rather than an optional filter. Non-compliant stocks are excluded from the universe, and if a held stock becomes non-compliant during a backtest, the strategy must follow a defined exit rule. Performance reports should also note any impure income that may require purification.
+## Out of scope (Phase 1)
 
-## **Out of Scope (Phase 1)**
+Live execution, brokerage integration, investor onboarding, fund administration, and real-time trading terminals. Those belong to Phase 2.
 
-The following items are not part of Phase 1: live order execution or brokerage integration, investor onboarding or fund administration, natural-language strategy builders or public strategy sharing, and real-time trading terminals. These items may be revisited in Phase 2 if the research results support them.
+## Success criteria for Phase 1
 
-## **Success Criteria for Phase 1**
+Phase 1 is done when we have:
 
-Phase 1 is complete when the project has a reproducible compliant stock universe for a defined market and time range, at least one fully specified and backtested strategy, documented backtest methodology and results, and a clear recommendation on whether to proceed to Phase 2.
+1. A reproducible Halal universe for a defined market and window  
+2. A **combined** strategy book (not only isolated factor notebooks) with risk and compliance rules  
+3. Documented backtests, including turnover, costs, and purification drag  
+4. A clear recommendation: proceed to Phase 2, revise the book, or stop  
