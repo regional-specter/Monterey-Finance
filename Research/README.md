@@ -67,14 +67,17 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-| ID | Study | Status |
-| --- | --- | --- |
-| **B1** | Multi-strategy book — combine kept sleeves into one portfolio | Next |
-| **B2** | Risk rules — name/sector caps, book-level regime / drawdown throttle | Next |
-| **B3** | Compliance ops — breach exits, purification process, monitoring | Next |
-| **B4** | Friction & capacity — turnover, costs, AUM breakpoints | Next |
+Do **07 → 12** first. **13–15** support the book once the core blend exists.
 
-Optional later (only if useful for steady growth): distress buffer (**03**), tail-risk sizing (**12**), sector neutralization diagnostic (**13**), compliance-boundary flows (**14**).
+| # | Study | Status |
+| --- | --- | --- |
+| **07** | Multi-strategy sleeve blend | Next |
+| **08** | Risk budget & concentration caps | Next |
+| **09** | Book-level regime throttle | Next |
+| **10** | Compliance breach exits | Next |
+| **11** | Purification process design | Next |
+| **12** | Turnover, costs & capacity | Next |
+| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 07–12 |
 
 ---
 
@@ -182,56 +185,56 @@ This is an internal exploratory note, not a finished proof and not a live-return
 <br clear="all">
 
 
-### Value & Dividend Mechanics
+### Fund Book Construction
 
-**7. Net Post-Purification Dividend Safety**
+**7. Multi-Strategy Sleeve Blend**
 
-- **Mechanics:** Rank high-dividend Halal stocks by FCF coverage ratios, deducting calculated impure income (`< 5%` threshold) directly from net dividend yields.
-- **White Paper Focus:** Designing post-purification yield optimization to prevent dividend drag.
+- **Mechanics:** Combine kept sleeves (FCF quality, ROIC, dual-momentum regime, optional SUE satellite) into one Halal book with explicit sleeve weights and a shared monthly rebalance calendar.
+- **White Paper Focus:** Whether a blended steady-growth book beats any single sleeve on drawdown-adjusted compounding after Halal screens.
 
-**8. Debt-Adjusted Value (EBITDA / Enterprise Value)**
+**8. Risk Budget & Concentration Caps**
 
-- **Mechanics:** Deep value strategy ranking stocks by EV/EBITDA rather than P/E to explicitly account for cash reserves and zero-interest debt models.
-- **White Paper Focus:** Preventing "value traps" by enforcing point-in-time AAOIFI financial ratio screens on historically cheap stocks.
+- **Mechanics:** Apply hard single-name and sector caps (and optional vol targeting) on the blended book; compare uncapped mega-cap concentration versus capped variants.
+- **White Paper Focus:** How much steady-growth path improves when concentration risk is forced down without killing the Halal quality core.
 
-**9. Asset Light Book-to-Market (Intangible Adjusted)**
+**9. Book-Level Regime Throttle**
 
-- **Mechanics:** Adjust Book Value by adding capitalized R&D and SG&A expenses, then rank the Halal universe by adjusted Price-to-Book.
-- **White Paper Focus:** Fixing traditional Value metrics for technology-heavy Halal stock pools.
+- **Mechanics:** Run the blended book risk-on only when a market trend rule holds (e.g. SPY above 200-day SMA); otherwise cut equity exposure or shift to a defensive Halal sleeve.
+- **White Paper Focus:** Using dual-momentum-style regime logic as a whole-book drawdown brake, not as another stock-picking factor.
 
-### Risk Parity & Volatility Modeling
+### Halal Operations & Friction
 
-**10. Inverse-Variance Low Volatility (Smart Beta)**
+**10. Point-in-Time Compliance Breach Exits**
 
-- **Mechanics:** Select the 50 lowest 252-day volatility stocks from the compliant universe and weight them by inverse variance.
-- **White Paper Focus:** Evaluating Low-Vol anomaly returns as a structural proxy for fixed-income exposure.
+- **Mechanics:** Monitor AAOIFI debt / cash / receivables ratios between rebalances; define forced exit lags (same day, next open, month-end) when a held name fails.
+- **White Paper Focus:** Operational exit rules for losing compliance — cost, tracking error, and what “steady” looks like under strict Sharia process.
 
-**11. Minimum Variance Portfolio Optimization (MVO)**
+**11. Purification Process Design**
 
-- **Mechanics:** Apply Ledoit-Wolf covariance shrinkage estimation to construct a Minimum Variance portfolio within Halal equity bounds.
-- **White Paper Focus:** Portfolio variance minimization in the absence of conventional bonds, preferred shares, or cash interest yields.
+- **Mechanics:** Estimate impure dividend income on holdings, schedule purification cash outflows, and measure net investor path versus gross backtest returns.
+- **White Paper Focus:** Turning purification from a footnote into a runnable cash policy for a live Halal fund.
 
-**12. Tail-Risk Constrained Downside Beta**
+**12. Turnover, Costs & Capacity**
 
-- **Mechanics:** Optimize position sizing based on Semi-Variance and Conditional Value at Risk (CVaR) rather than standard variance.
-- **White Paper Focus:** Assessing left-tail risk asymmetry in Sharia vs. Non-Sharia index drawdowns during liquidity crunches.
+- **Mechanics:** Stress the blended book under trading-cost assumptions and AUM scales; find where liquidity and turnover break steady-growth economics.
+- **White Paper Focus:** Practical capacity limits before Phase 2 capital raises.
 
-### Macro, Sector & Arbitrage Strategies
+### Portfolio Diagnostics (supporting)
 
-**13. Dynamic Sector Neutralization (Factor Isolation)**
+**13. Sleeve Correlation & Diversification Audit**
 
-- **Mechanics:** Long top-factor stocks (e.g. Quality or Value) while neutralizing sector overweights (e.g. Tech/Staples) relative to the S&P 500 / MSCI World.
-- **White Paper Focus:** Isolating pure factor performance from accidental sector tilt alpha.
+- **Mechanics:** Measure pairwise correlations, overlapping holdings, and marginal risk contribution across quality, ROIC, momentum, and SUE sleeves.
+- **White Paper Focus:** Whether the blend is real diversification or the same mega-cap tech book counted four ways.
 
-**14. Point-in-Time Compliance Migration Arbitrage**
+**14. Tail-Risk Position Sizing (CVaR)**
 
-- **Mechanics:** Track stocks near financial ratio boundaries (e.g. `28%–29%` debt-to-market cap). Model forced buying/selling dynamics as stocks enter or exit official Islamic indices.
-- **White Paper Focus:** Measuring price impact, liquidity drag, and exit rules for stocks losing compliance status.
+- **Mechanics:** Size positions (or sleeve weights) using downside risk / CVaR instead of equal or cap weights inside the Halal universe.
+- **White Paper Focus:** Left-tail control for a steady-growth mandate when conventional bonds and cash yield are limited.
 
-**15. Sharia-ESG Multi-Factor Integration**
+**15. Compliance Boundary Monitoring**
 
-- **Mechanics:** Combine MSCI/AAOIFI financial screens with high ESG Governance (G) and Environmental (E) scores to build a composite multi-factor ranking.
-- **White Paper Focus:** Synergies between Islamic financial restrictions and ESG sustainability factor premiums.
+- **Mechanics:** Track names near AAOIFI ratio boundaries (e.g. debt/market cap `28%–29%`) and model pre-emptive trims before forced index / screen exits.
+- **White Paper Focus:** Early-warning compliance ops to reduce sudden turnover and gap risk in the live book.
 
 
 ---
@@ -244,17 +247,17 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What worked in-sample:** quality / cash generation, ROIC compounders, dual-momentum regime filter, selective earnings surprise (and high-beta tech as a high-risk sleeve).
 
-**What failed:** deep value and high-dividend ranking (papers 07–08). In our window they underweight the Halal mega-cap growth core that dominates SPUS. More papers in that family are **paused**.
+**What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
 ### Phase 1B — Fund book design (active next)
 
-Stop hunting more single factors for now. Build the book we would actually run:
+Stop hunting more single factors for now. Build the book we would actually run — papers **07–12** in the backlog below.
 
 1. **Freeze winning sleeves** — e.g. quality (01), ROIC (02), regime / momentum (04), optional SUE satellite (06). High-beta (05) only if the risk budget allows it.
-2. **Combine into one portfolio** — sleeve weights, rebalance rules, shared Halal universe.
-3. **Risk rules** — single-name cap, sector cap, drawdown / trend throttle on the whole book.
-4. **Halal ops** — mid-period AAOIFI breach exits; purification as a real process, not only a footnote.
-5. **Costs and capacity** — turnover budget; at what size the book breaks.
+2. **Combine into one portfolio (07)** — sleeve weights, rebalance rules, shared Halal universe.
+3. **Risk rules (08–09)** — single-name/sector caps; drawdown / trend throttle on the whole book.
+4. **Halal ops (10–11)** — mid-period AAOIFI breach exits; purification as a real process.
+5. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
 
 A topic in 1B is complete when the folder has a reproducible notebook, figures, and a short write-up that answers: *would we run this?*
 
