@@ -151,6 +151,10 @@ def attach_sue(earnings: pd.DataFrame, min_prior: int = 6) -> pd.DataFrame:
 
 
 def qualifying_prints(sue_events: pd.DataFrame, sue_threshold: float = 2.0) -> pd.DataFrame:
+    if sue_events is None or sue_events.empty or "sue" not in sue_events.columns:
+        return pd.DataFrame(
+            columns=["symbol", "announce_date", "sue", "ue", "sigma_ue"]
+        )
     return sue_events[
         sue_events["sue"].notna()
         & np.isfinite(sue_events["sue"])
@@ -168,3 +172,116 @@ def latest_events_as_of(sue_events: pd.DataFrame, as_of) -> pd.DataFrame:
         return snap
     snap = snap.sort_values(["symbol", "announce_date"])
     return snap.groupby("symbol", as_index=False).tail(1)
+
+
+def _to_naive_ts(value) -> pd.Timestamp:
+    ts = pd.Timestamp(value)
+    if getattr(ts, "tzinfo", None) is not None:
+        ts = ts.tz_convert("UTC").tz_localize(None)
+    return ts.normalize()
+
+
+def _col(frame: pd.DataFrame, *names: str) -> pd.Series | None:
+    lookup = {str(c).strip().lower(): c for c in frame.columns}
+    for name in names:
+        hit = lookup.get(name.strip().lower())
+        if hit is not None:
+            return frame[hit]
+    # substring fallback: "Reported EPS" matches "reported eps"
+    for name in names:
+        needle = name.strip().lower()
+        for key, col in lookup.items():
+            if needle in key:
+                return frame[col]
+    return None
+
+
+def fetch_earnings_history(symbols: list[str], limit: int = 40) -> pd.DataFrame:
+    """Quarterly consensus vs actual EPS from Yahoo earnings dates.
+
+    Column names vary by yfinance version (Reported EPS vs epsActual). Empty
+    result with a printed sample means the parser missed a new schema.
+    """
+    import yfinance as yf
+
+    from .weighting import collapse_share_classes
+
+    rows: list[dict] = []
+    n = len(symbols)
+    sample_cols: list[str] | None = None
+    for i, symbol in enumerate(symbols, 1):
+        if i == 1 or i % 25 == 0 or i == n:
+            print(f"  Earnings calendar {i}/{n}", flush=True)
+        try:
+            ticker = yf.Ticker(symbol)
+            try:
+                raw = ticker.get_earnings_dates(limit=limit)
+            except TypeError:
+                raw = ticker.get_earnings_dates()
+            if raw is None or not isinstance(raw, pd.DataFrame) or raw.empty:
+                raw = getattr(ticker, "earnings_dates", None)
+            if raw is None or not isinstance(raw, pd.DataFrame) or raw.empty:
+                continue
+        except Exception:
+            continue
+
+        frame = raw.copy()
+        if not isinstance(frame.index, pd.RangeIndex):
+            frame = frame.reset_index()
+        if sample_cols is None:
+            sample_cols = [str(c) for c in frame.columns]
+
+        date_col = None
+        for candidate in frame.columns:
+            key = str(candidate).strip().lower().replace("_", " ")
+            if key in {"earnings date", "date", "index", "announce date"}:
+                date_col = candidate
+                break
+        if date_col is None:
+            for candidate in frame.columns:
+                if pd.api.types.is_datetime64_any_dtype(frame[candidate]):
+                    date_col = candidate
+                    break
+        if date_col is None:
+            continue
+
+        actual = _col(frame, "Reported EPS", "reported EPS", "epsActual", "reported_eps")
+        estimate = _col(frame, "EPS Estimate", "epsEstimate", "eps_estimate")
+        surprise = _col(frame, "Surprise(%)", "surprisePercent", "surprise_pct")
+        if actual is None or estimate is None:
+            continue
+
+        for loc in frame.index:
+            try:
+                announce = _to_naive_ts(frame.at[loc, date_col])
+            except Exception:
+                continue
+            act = pd.to_numeric(actual.at[loc], errors="coerce")
+            est = pd.to_numeric(estimate.at[loc], errors="coerce")
+            if pd.isna(act) or pd.isna(est):
+                continue
+            spr = np.nan
+            if surprise is not None:
+                spr = pd.to_numeric(surprise.at[loc], errors="coerce")
+            if pd.isna(spr) and float(est) != 0:
+                spr = (float(act) - float(est)) / abs(float(est))
+            rows.append(
+                {
+                    "symbol": symbol,
+                    "announce_date": announce.date(),
+                    "eps_actual": float(act),
+                    "eps_estimate": float(est),
+                    "ue": float(act) - float(est),
+                    "surprise_pct": float(spr) if pd.notna(spr) else np.nan,
+                }
+            )
+
+    empty = pd.DataFrame(
+        columns=["symbol", "announce_date", "eps_actual", "eps_estimate", "ue", "surprise_pct"]
+    )
+    if not rows:
+        if sample_cols:
+            print("  Yahoo earnings columns were:", sample_cols)
+        return empty
+    out = pd.DataFrame(rows).drop_duplicates(subset=["symbol", "announce_date"])
+    return collapse_share_classes(out.sort_values(["symbol", "announce_date"]).reset_index(drop=True))

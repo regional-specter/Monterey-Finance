@@ -73,7 +73,11 @@ class SleeveBook:
     def run(self, start: str | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Daily book returns and the rebalance log of blended weights."""
         dates = set(rebalance_dates(self.lab.metrics))
-        if self.lab.sue_events is not None and not self.lab.sue_events.empty:
+        if (
+            "sue" in self.active_sleeves()
+            and self.lab.sue_events is not None
+            and not self.lab.sue_events.empty
+        ):
             extra = pd.to_datetime(self.lab.sue_events["announce_date"]).dt.date.tolist()
             dates |= set(extra)
         eval_dates = sorted(
@@ -110,3 +114,17 @@ class SleeveBook:
             else pd.DataFrame(columns=["symbol", "weight", "as_of"])
         )
         return returns, log
+
+
+def run_sleeve(
+    lab: "Lab",
+    sleeve_id: str,
+    start: str | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Standalone sleeve path (100% weight, no book throttle, no name cap)."""
+    return SleeveBook(
+        lab,
+        sleeve_weights={sleeve_id: 1.0},
+        name_cap=None,
+        throttle=None,
+    ).run(start=start)

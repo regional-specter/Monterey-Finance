@@ -62,7 +62,9 @@ def halal_pass(
         columns=[c for c in ("debt_ratio", "cash_ratio", "receivables_ratio") if c in work.columns]
     )
     passed = work.merge(screened, on="symbol", how="inner")
-    passed = passed[passed["is_compliant"].fillna(False)].copy()
+    passed = passed.loc[passed["is_compliant"].fillna(False).astype(bool)].copy()
+    if passed.empty or "market_cap" not in passed.columns:
+        return passed
     passed = passed[pd.to_numeric(passed["market_cap"], errors="coerce") > 0]
     return passed
 

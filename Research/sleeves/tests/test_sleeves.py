@@ -11,7 +11,8 @@ from sleeves.fundamentals import attach_sue
 from sleeves.lab import Lab
 from sleeves.prices import spy_sma_risk_on
 from sleeves.rules import FrozenRules
-from sleeves.select import select_fcf_quality, select_roic, select_sue
+from sleeves.book import run_sleeve
+from sleeves.select import select_dual_momentum, select_fcf_quality, select_roic, select_sue
 from sleeves.weighting import blend_sleeve_weights
 
 
@@ -151,3 +152,35 @@ def test_lab_evaluate_dual_momentum_cash():
     assert state["dual_momentum"].triggered is False
     assert "cash" in state["dual_momentum"].reason.lower() or "below" in state["dual_momentum"].reason.lower()
     assert state["fcf_quality"].n_holdings >= 5
+
+
+def test_dual_momentum_empty_snapshot_no_keyerror():
+    picks = select_dual_momentum(_metrics("2024-01-31"), pd.DataFrame(), "2020-01-31")
+    assert picks.empty
+    assert list(picks.columns)
+
+
+def test_run_sleeve_ignores_sue_dates_for_core():
+    metrics = _metrics("2024-01-31")
+    idx = pd.bdate_range("2023-01-02", periods=260)
+    px = pd.DataFrame({sym: np.linspace(80, 120, len(idx)) for sym in metrics["symbol"].unique()})
+    px["SPY"] = np.linspace(80, 120, len(idx))
+    px.index = idx
+    prices = px.stack().rename("adj_close").reset_index()
+    prices.columns = ["date", "symbol", "adj_close"]
+    lab = Lab.from_frames(
+        metrics,
+        prices,
+        sue_events=pd.DataFrame(
+            {
+                "symbol": ["AAA"],
+                "announce_date": [date(2023, 6, 15)],
+                "sue": [3.0],
+            }
+        ),
+        rules=FrozenRules().with_dual_momentum(apply_sma=False, min_holdings=5, keep_quantile=0.5),
+    )
+    ret, log = run_sleeve(lab, "dual_momentum", start="2023-01-02")
+    assert not ret.empty
+    if not log.empty:
+        assert date(2023, 6, 15) not in set(pd.to_datetime(log["as_of"]).dt.date)

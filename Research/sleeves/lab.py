@@ -110,10 +110,14 @@ class Lab:
 
     def fcf_panel(self) -> pd.DataFrame:
         if self._fcf_panel is None:
+            base = self.metrics.copy()
+            if "fcf" not in base.columns or base["fcf"].isna().all():
+                if "free_cash_flow" in base.columns:
+                    base["fcf"] = pd.to_numeric(base["free_cash_flow"], errors="coerce")
             if self.fcf_history is None or self.fcf_history.empty:
-                self._fcf_panel = self.metrics
+                self._fcf_panel = base
             else:
-                self._fcf_panel = attach_latest_fcf(self.metrics, self.fcf_history)
+                self._fcf_panel = attach_latest_fcf(base, self.fcf_history)
         return self._fcf_panel
 
     def roic_panel(self) -> pd.DataFrame:
@@ -142,9 +146,12 @@ class Lab:
         if sleeve_id == "roic":
             return select_roic(self.roic_panel(), as_of, self.rules)
         if sleeve_id == "dual_momentum":
-            return select_dual_momentum(
+            holds = select_dual_momentum(
                 self.metrics, self.price_panel(), as_of, self.rules
             )
+            if self.rules.dual_momentum.apply_sma and not self.regime(as_of).on:
+                return holds.iloc[0:0]
+            return holds
         if sleeve_id == "high_beta":
             return select_high_beta(self.metrics, self.price_panel(), as_of, self.rules)
         if sleeve_id == "sue":

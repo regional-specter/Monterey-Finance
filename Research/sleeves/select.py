@@ -7,7 +7,7 @@ from datetime import date
 import numpy as np
 import pandas as pd
 
-from .compliance import collapse_issuers, halal_pass, last_snapshot_on_or_before, snapshot_on
+from .compliance import collapse_issuers, halal_pass, last_snapshot_on_or_before
 from .fundamentals import (
     latest_events_as_of,
     qualifying_prints,
@@ -18,6 +18,12 @@ from .prices import rolling_beta, trading_days_between, trailing_return, trailin
 from .rules import FOCUS_BUCKETS, FrozenRules
 from .universe import classify_focus, is_tech_or_clean_energy
 from .weighting import assign_cap_weights, assign_equal_weights
+
+
+def _positive_cap(passed: pd.DataFrame) -> pd.DataFrame:
+    if passed is None or passed.empty or "market_cap" not in passed.columns:
+        return pd.DataFrame() if passed is None or passed.empty else passed.iloc[0:0]
+    return passed[pd.to_numeric(passed["market_cap"], errors="coerce") > 0]
 
 
 def select_fcf_quality(
@@ -37,7 +43,7 @@ def select_fcf_quality(
         "cash_ratio",
         "receivables_ratio",
     ]
-    snap = snapshot_on(panel, as_of)
+    snap = last_snapshot_on_or_before(panel, as_of)
     passed = halal_pass(snap, rules)
     if passed.empty:
         return pd.DataFrame(columns=empty_cols)
@@ -93,7 +99,7 @@ def select_roic(
         "receivables_ratio",
         "focus_bucket",
     ]
-    snap = snapshot_on(panel, as_of)
+    snap = last_snapshot_on_or_before(panel, as_of)
     passed = halal_pass(snap, rules)
     if passed.empty:
         return pd.DataFrame(columns=empty_cols)
@@ -156,9 +162,8 @@ def select_dual_momentum(
         "cash_ratio",
         "receivables_ratio",
     ]
-    snap = snapshot_on(panel, as_of)
-    passed = halal_pass(snap, rules)
-    passed = passed[pd.to_numeric(passed.get("market_cap"), errors="coerce") > 0]
+    snap = last_snapshot_on_or_before(panel, as_of)
+    passed = _positive_cap(halal_pass(snap, rules))
     if passed.empty:
         return pd.DataFrame(columns=empty_cols)
 
@@ -209,7 +214,7 @@ def select_high_beta(
         "cash_ratio",
         "receivables_ratio",
     ]
-    snap = snapshot_on(panel, as_of)
+    snap = last_snapshot_on_or_before(panel, as_of)
     passed = halal_pass(snap, rules)
     cfg = rules.high_beta
     if cfg.restrict_tech and not passed.empty:
@@ -223,7 +228,7 @@ def select_high_beta(
                 for _, r in passed.iterrows()
             ]
             passed = passed.loc[mask].copy()
-    passed = passed[pd.to_numeric(passed.get("market_cap"), errors="coerce") > 0]
+    passed = _positive_cap(passed)
     if passed.empty:
         return pd.DataFrame(columns=empty_cols)
 
@@ -280,6 +285,8 @@ def select_sue(
         "cash_ratio",
         "receivables_ratio",
     ]
+    if sue_events is None or sue_events.empty or "sue" not in sue_events.columns:
+        return pd.DataFrame(columns=empty_cols)
     cfg = rules.sue
     as_of_d = pd.Timestamp(as_of).date()
     live = latest_events_as_of(qualifying_prints(sue_events, cfg.sue_threshold), as_of_d)

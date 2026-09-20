@@ -18,7 +18,7 @@ Typical notebook start:
     returns, log = lab.book(sleeve_weights={"fcf_quality": 0.8, "sue": 0.2}).run()
 """
 
-from .book import SleeveBook
+from .book import SleeveBook, run_sleeve
 from .lab import Lab, SleeveState
 from .rules import (
     SLEEVE_IDS,
@@ -33,6 +33,7 @@ from .select import (
     select_roic,
     select_sue,
 )
+from .fundamentals import attach_sue, fetch_earnings_history
 from .stats import calc_performance_stats, stats_table
 from .triggers import sma_trigger
 from .weighting import blend_sleeve_weights
@@ -45,8 +46,11 @@ __all__ = [
     "SLEEVE_LABELS",
     "SleeveBook",
     "SleeveState",
+    "run_sleeve",
     "blend_sleeve_weights",
     "calc_performance_stats",
+    "attach_sue",
+    "fetch_earnings_history",
     "select_dual_momentum",
     "select_fcf_quality",
     "select_high_beta",
