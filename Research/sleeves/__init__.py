@@ -1,0 +1,57 @@
+"""Reusable Halal sleeves for papers 07–12.
+
+Typical notebook start:
+
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path("../..").resolve()))  # Research/
+
+    from sleeves import FrozenRules, Lab
+
+    rules = FrozenRules().with_fcf(keep_quantile=0.40).with_book(name_cap=0.05)
+    lab = Lab.from_frames(metrics, prices, fcf_history=fcf_history, rules=rules)
+
+    state = lab.evaluate("2022-06-30")
+    state["dual_momentum"].triggered   # False if SPY is below the 200-day SMA
+    state["fcf_quality"].holdings
+
+    returns, log = lab.book(sleeve_weights={"fcf_quality": 0.8, "sue": 0.2}).run()
+"""
+
+from .book import SleeveBook
+from .lab import Lab, SleeveState
+from .rules import (
+    SLEEVE_IDS,
+    SLEEVE_LABELS,
+    FrozenRules,
+)
+from .select import (
+    SELECTORS,
+    select_dual_momentum,
+    select_fcf_quality,
+    select_high_beta,
+    select_roic,
+    select_sue,
+)
+from .stats import calc_performance_stats, stats_table
+from .triggers import sma_trigger
+from .weighting import blend_sleeve_weights
+
+__all__ = [
+    "FrozenRules",
+    "Lab",
+    "SELECTORS",
+    "SLEEVE_IDS",
+    "SLEEVE_LABELS",
+    "SleeveBook",
+    "SleeveState",
+    "blend_sleeve_weights",
+    "calc_performance_stats",
+    "select_dual_momentum",
+    "select_fcf_quality",
+    "select_high_beta",
+    "select_roic",
+    "select_sue",
+    "sma_trigger",
+    "stats_table",
+]

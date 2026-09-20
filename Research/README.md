@@ -39,9 +39,25 @@ Beating SPUS is interesting. It is **not** the mandate.
 4. Write up with the structure below (factor papers) or a shorter ops note (1B studies).
 5. Decide: follow-up, revise, or kill.
 
+Frozen live rules for papers **01, 02, 04, 05, 06** live in [`sleeves/`](sleeves/). New 1B notebooks should load that package instead of copying selector cells:
+
+```python
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path("../..").resolve()))  # Research/
+
+from sleeves import FrozenRules, Lab
+
+rules = FrozenRules().with_book(name_cap=0.08, throttle="spy_sma")
+lab = Lab.from_frames(metrics, prices, fcf_history=fcf_history, sue_events=sue_events, rules=rules)
+state = lab.evaluate("2022-06-30")
+returns, log = lab.book(sleeve_weights={"fcf_quality": 0.4, "roic": 0.4, "sue": 0.2}).run()
+```
+
 ```text
 Research/
 ├── README.md
+├── sleeves/          # reusable live-rule loaders, thresholds, triggers
 ├── assets/
 └── papers/
     ├── 01-fcf-ev/
