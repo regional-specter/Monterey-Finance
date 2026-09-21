@@ -31,7 +31,11 @@ class SleeveBook:
         book = self.rules.book
         self.sleeve_weights = sleeve_weights or dict(book.sleeve_weights)
         self.name_cap = name_cap if name_cap is not None else book.name_cap
-        self.throttle = throttle if throttle is not None else book.throttle
+        resolved = throttle if throttle is not None else book.throttle
+        if resolved is None or str(resolved).lower() in {"off", "none", ""}:
+            self.throttle = None
+        else:
+            self.throttle = resolved
 
     def active_sleeves(self) -> list[str]:
         return [
@@ -126,5 +130,5 @@ def run_sleeve(
         lab,
         sleeve_weights={sleeve_id: 1.0},
         name_cap=None,
-        throttle=None,
+        throttle="off",
     ).run(start=start)

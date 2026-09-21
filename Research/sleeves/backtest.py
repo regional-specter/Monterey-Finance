@@ -21,11 +21,13 @@ def run_weight_schedule(
     weights_by_date: dict[date, pd.Series],
     start: str | None = None,
     throttle_on: pd.Series | None = None,
+    off_weights_by_date: dict[date, pd.Series] | None = None,
 ) -> pd.DataFrame:
     """Apply the latest weights as of each day. Missing return before first live day.
 
     ``throttle_on`` is an optional daily boolean series (True = stay invested).
-    When False the book earns 0 (cash).
+    When False the book earns 0 (cash), unless ``off_weights_by_date`` is set
+    (defensive sleeve while the regime is off).
     """
     panel = to_price_panel(prices)
     rets = daily_returns(panel)
@@ -58,6 +60,26 @@ def run_weight_schedule(
                 prior = throttle_map.loc[:dt]
                 risk_on = bool(prior.iloc[-1]) if not prior.empty else False
             if not risk_on:
+                if off_weights_by_date:
+                    off_key = last_rebalance_on_or_before(sorted(off_weights_by_date), dt.date())
+                    off_w = off_weights_by_date.get(off_key, pd.Series(dtype=float)) if off_key is not None else pd.Series(dtype=float)
+                    held = [s for s in off_w.index if s in rets.columns]
+                    w = off_w.reindex(held).astype(float)
+                    w = w[w > 0]
+                    if w.empty:
+                        rows.append({"date": dt.date(), "return": 0.0 if live else float("nan"), "n_holdings": 0})
+                    else:
+                        live = True
+                        w = w / w.sum()
+                        day_ret = (rets.loc[dt, w.index] * w).sum(skipna=True)
+                        rows.append(
+                            {
+                                "date": dt.date(),
+                                "return": 0.0 if pd.isna(day_ret) else float(day_ret),
+                                "n_holdings": int(len(w)),
+                            }
+                        )
+                    continue
                 if not live:
                     rows.append({"date": dt.date(), "return": float("nan"), "n_holdings": 0})
                 else:
