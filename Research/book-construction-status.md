@@ -300,6 +300,7 @@ engine:       fcf_quality = 100%
               (top half of Halal names by FCF / sales, cap-weighted, monthly)
 throttle:     spy_sma (200-day). Full NAV in cash if SPY is at or below the average
 name_cap:     10%
+breach_exit:  next_open (sell a failed AAOIFI name the session after the filing is known)
 not in book:  roic, dual_momentum weight, sue, high_beta
 cost assumption: 10 basis points one-way
 ```
@@ -311,6 +312,7 @@ FrozenRules().with_book(
     sleeve_weights={"fcf_quality": 1.0},
     throttle="spy_sma",
     name_cap=0.10,
+    breach_exit="next_open",
 )
 ```
 
@@ -352,7 +354,7 @@ Open items:
 | Paper | Topic | Why it still matters |
 | --- | --- | --- |
 | 09 | Regime throttle write-up | Config 8 is live. Write the rule, cash days, and 2020 lag. Do not re-grid weights. |
-| 10 | Compliance breach exits | A name that fails AAOIFI mid-month needs an exit rule. |
+| 10 | Compliance breach exits | Done. Next-session sell on a failed filing. Month-end wait left ~150 name-days non-compliant. P&L gap is tiny. |
 | 11 | Purification | Impure income reporting. Not in the backtest P and L. |
 | 12 | Turnover, costs, capacity | 10 bp was a stub. Measure real friction on this book. |
 | Later | Diversification / CVaR sizing | Sector concentration remains after the 10% name cap. |
@@ -371,7 +373,10 @@ Open items:
 | `papers/08-risk-budget/code.ipynb` | Config 8 risk and name-cap ladder |
 | `papers/08-risk-budget/name_cap_ladder.csv` | Numbers for section 8 |
 | `papers/08-risk-budget/figures/` | Regime, sectors, cap ladder |
-| `sleeves/` | Frozen live rules for papers 01, 02, 04, 05, 06 |
+| `papers/09-regime-throttle/code.ipynb` | SMA-to-cash versus defensive sleeve |
+| `papers/10-compliance-exits/code.ipynb` | Same-day / next-open / month-end AAOIFI exits |
+| `papers/10-compliance-exits/exit_lag_results.csv` | Numbers for paper 10 |
+| `sleeves/` | Frozen live rules for papers 01, 02, 04, 05, 06, 10 |
 
 ---
 
@@ -384,5 +389,7 @@ The mix did not.
 One quality ranking (FCF) plus an on/off market switch on the full book plus a 10% single-name cap is the current research outcome.
 
 The switch cuts the largest loss from about −29% to about −9%. The book is in cash about one day in four. The cap cuts typical top-5 weight from about 48% to about 37%. It does not change the cash path.
+
+Paper 10: if a held name fails AAOIFI on a new filing, sell at the **next session**. Waiting until month-end left about 150 name-days of known non-compliance. The return path barely moves.
 
 That is where we stand.

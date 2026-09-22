@@ -52,6 +52,7 @@ rules = FrozenRules().with_book(
     sleeve_weights={"fcf_quality": 1.0},
     name_cap=0.10,
     throttle="spy_sma",
+    breach_exit="next_open",
 )
 lab = Lab.from_frames(metrics, prices, rules=rules)
 returns, log = lab.book().run()
@@ -86,17 +87,17 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-Papers **07–09** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash. Do **10 → 12** next. **13–15** support the book once ops exist.
+Papers **07–10** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits. Do **11 → 12** next. **13–15** support the book once ops exist.
 
 | # | Study | Status |
 | --- | --- | --- |
 | **07** | Multi-strategy sleeve blend | Done |
 | **08** | Risk budget & concentration caps | Done |
 | **09** | Book-level regime throttle | Done |
-| **10** | Compliance breach exits | Next |
+| **10** | Compliance breach exits | Done |
 | **11** | Purification process design | Next |
 | **12** | Turnover, costs & capacity | Next |
-| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 10–12 |
+| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 11–12 |
 
 ---
 
@@ -259,10 +260,22 @@ This is an internal exploratory note. The on/off switch belongs on **100% of NAV
 
 ### Halal Operations & Friction
 
-**10. Point-in-Time Compliance Breach Exits**
+**10. Point-in-Time Compliance Breach Exits ✅**
 
 - **Mechanics:** Monitor AAOIFI debt / cash / receivables ratios between rebalances; define forced exit lags (same day, next open, month-end) when a held name fails.
 - **White Paper Focus:** Operational exit rules for losing compliance — cost, tracking error, and what “steady” looks like under strict Sharia process.
+
+<div>
+<img width="480" align="left" alt="Paper 10 compliance exit lag equity curves" src="papers/10-compliance-exits/figures/equity-curves.png" />
+
+**Sell the Fail at the Next Session:** *An Exploratory Breach-Exit Study, 2019–2024*
+
+This is an internal exploratory note. The FCF book only re-screens at month-end. Over 2019–2024, **25** held names failed AAOIFI on a new filing before the next rebalance (19 debt, 6 cash). Waiting until month-end left about **150 name-days** of known non-compliance. Selling the next session cut that to **25 name-days**. Daily 24-month market-cap monitoring added only **3** extra nicks, all sitting on the 30% line. Same-day, next-open, and month-end have the **same −9.0% max drawdown**. Tracking error versus month-end is about **4 bp**. Extra one-way turnover is about 13% over five years; a 10 bp cost stub is ~3 bp of drag. Architecture takeaway: the live ops rule is **`breach_exit="next_open"`** on filings. Same-day is slightly optimistic (after-hours EDGAR). Do not wait for month-end if a 10-Q has already failed.
+
+[Open the study](papers/10-compliance-exits/code.ipynb)
+</div>
+<br clear="all">
+
 
 **11. Purification Process Design**
 
@@ -304,15 +317,16 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
-### Phase 1B — Fund book design (07–09 done; 10–12 next)
+### Phase 1B — Fund book design (07–10 done; 11–12 next)
 
-Working architecture from 07–09: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash**.
+Working architecture from 07–10: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits**.
 
 1. **Engine (07)** — one quality funnel, not a 40/40/20 mix. High-beta (05) stays out of the core.
 2. **Size rule (08)** — 10% single-name cap.
 3. **Market switch (09)** — SPY trend on/off on 100% of NAV; cash when off.
-4. **Halal ops (10–11)** — mid-period AAOIFI breach exits; purification as a real process.
-5. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
+4. **Breach exits (10)** — if a held name fails AAOIFI on a new filing, sell at the **next session**; stay out until the next month-end screen.
+5. **Halal ops (11)** — purification as a real process.
+6. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
 
 A topic in 1B is complete when the folder has a reproducible notebook, figures, and a short write-up that answers: *would we run this?*
 

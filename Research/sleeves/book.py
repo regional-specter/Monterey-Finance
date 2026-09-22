@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import pandas as pd
 
 from .backtest import holdings_to_weights, run_weight_schedule
+from .exits import apply_breach_exits, detect_breaches
 from .prices import spy_sma_risk_on
 from .rules import FrozenRules, SLEEVE_IDS
 from .triggers import rebalance_dates
@@ -44,9 +45,9 @@ class SleeveBook:
             if w and w > 0 and sid in SLEEVE_IDS
         ]
 
-    def blended_holdings(self, as_of: date | str) -> pd.DataFrame:
+    def blended_holdings(self, as_of: date | str, apply_throttle: bool = True) -> pd.DataFrame:
         as_of_d = pd.Timestamp(as_of).date()
-        if self.throttle == "spy_sma":
+        if apply_throttle and self.throttle == "spy_sma":
             spy = self.lab.spy_series()
             if not spy_sma_risk_on(spy, as_of_d, self.rules.dual_momentum.sma_window):
                 return pd.DataFrame(columns=["symbol", "weight", "sleeve"])
@@ -91,10 +92,18 @@ class SleeveBook:
         weights_by_date: dict[date, pd.Series] = {}
         log_frames: list[pd.DataFrame] = []
         for as_of in eval_dates:
-            blended = self.blended_holdings(as_of)
+            # Stock list every rebalance, even if the SMA is off. Cash is applied
+            # as throttle_on below (same as paper 09). Skipping month-ends while
+            # in cash would reuse a stale list when the switch turns back on.
+            blended = self.blended_holdings(as_of, apply_throttle=False)
             weights_by_date[as_of] = holdings_to_weights(blended)
-            if not blended.empty:
-                log_frames.append(blended.assign(as_of=as_of))
+            log_frames.append(blended.assign(as_of=as_of))
+
+        log = (
+            pd.concat(log_frames, ignore_index=True)
+            if log_frames
+            else pd.DataFrame(columns=["symbol", "weight", "as_of"])
+        )
 
         throttle_on = None
         price_index = self.lab.price_panel().index
@@ -106,16 +115,31 @@ class SleeveBook:
                 index=pd.to_datetime(price_index),
             )
 
+        lag = str(getattr(self.rules.book, "breach_exit", "month_end") or "month_end")
+        monitor = str(getattr(self.rules.book, "breach_monitor", "filings") or "filings")
+        if lag.lower() not in {"month_end", "none", "off", ""} and not log.empty:
+            events = detect_breaches(
+                self.lab.metrics,
+                log,
+                self.lab.price_panel(),
+                rules=self.rules,
+                monitor=monitor,
+                end=self.lab.end,
+                throttle_on=throttle_on,
+            )
+            weights_by_date = apply_breach_exits(
+                weights_by_date,
+                events,
+                price_index,
+                lag=lag,
+                name_cap=self.name_cap,
+            )
+
         returns = run_weight_schedule(
             self.lab.prices,
             weights_by_date,
             start=start or self.lab.start,
             throttle_on=throttle_on,
-        )
-        log = (
-            pd.concat(log_frames, ignore_index=True)
-            if log_frames
-            else pd.DataFrame(columns=["symbol", "weight", "as_of"])
         )
         return returns, log
 

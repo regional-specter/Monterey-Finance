@@ -12,6 +12,7 @@ from sleeves.lab import Lab
 from sleeves.prices import spy_sma_risk_on
 from sleeves.rules import FrozenRules
 from sleeves.book import run_sleeve
+from sleeves.exits import apply_breach_exits, detect_breaches, drop_name, exit_session
 from sleeves.select import select_dual_momentum, select_fcf_quality, select_roic, select_sue
 from sleeves.weighting import blend_sleeve_weights
 
@@ -184,3 +185,64 @@ def test_run_sleeve_ignores_sue_dates_for_core():
     assert not ret.empty
     if not log.empty:
         assert date(2023, 6, 15) not in set(pd.to_datetime(log["as_of"]).dt.date)
+
+
+def _two_month_metrics() -> pd.DataFrame:
+    jan = _metrics("2024-01-31")
+    feb = _metrics("2024-02-29")
+    jan["filed_date"] = pd.Timestamp("2023-12-15")
+    feb["filed_date"] = pd.Timestamp("2023-12-15")
+    blow = feb["symbol"] == "AAA"
+    feb.loc[blow, "filed_date"] = pd.Timestamp("2024-02-12")
+    cap = float(feb.loc[blow, "market_cap_24m"].iloc[0])
+    feb.loc[blow, "total_debt"] = 0.45 * cap
+    feb.loc[blow, "debt_ratio"] = 0.45
+    both = pd.concat([jan, feb], ignore_index=True)
+    both["report_date"] = both["as_of"]
+    return both
+
+
+def test_exit_session_lags():
+    idx = pd.bdate_range("2024-02-12", periods=5)
+    assert exit_session(idx, date(2024, 2, 12), "same_day") == date(2024, 2, 12)
+    assert exit_session(idx, date(2024, 2, 12), "next_open") == date(2024, 2, 13)
+    assert exit_session(idx, date(2024, 2, 10), "same_day") == date(2024, 2, 12)
+    assert exit_session(idx, date(2024, 2, 12), "month_end") is None
+
+
+def test_filing_breach_and_same_day_drop():
+    metrics = _two_month_metrics()
+    idx = pd.bdate_range("2024-01-02", periods=45)
+    px = pd.DataFrame({sym: np.linspace(100, 110, len(idx)) for sym in metrics["symbol"].unique()})
+    px["SPY"] = np.linspace(100, 110, len(idx))
+    px.index = idx
+    prices = px.stack().rename("adj_close").reset_index()
+    prices.columns = ["date", "symbol", "adj_close"]
+    rules = FrozenRules().with_fcf(min_holdings=5).with_book(
+        sleeve_weights={"fcf_quality": 1.0},
+        name_cap=0.10,
+        throttle="off",
+        breach_exit="month_end",
+    )
+    lab = Lab.from_frames(metrics, prices, rules=rules, start="2024-01-31", end="2024-02-29")
+    _, log = lab.book().run(start="2024-01-31")
+    events = detect_breaches(metrics, log, lab.price_panel(), rules=rules, monitor="filings")
+    assert not events.empty
+    assert "AAA" in set(events["symbol"])
+    assert events.iloc[0]["source"] == "filing"
+
+    jan = date(2024, 1, 31)
+    weights = {jan: log[pd.to_datetime(log["as_of"]).dt.date == jan].set_index("symbol")["weight"]}
+    same = apply_breach_exits(weights, events, idx, lag="same_day", name_cap=0.10)
+    nxt = apply_breach_exits(weights, events, idx, lag="next_open", name_cap=0.10)
+    hold = apply_breach_exits(weights, events, idx, lag="month_end", name_cap=0.10)
+    assert date(2024, 2, 12) in same
+    assert "AAA" not in same[date(2024, 2, 12)].index
+    assert date(2024, 2, 13) in nxt
+    assert "AAA" not in nxt[date(2024, 2, 13)].index
+    assert list(hold) == [jan]
+
+    leftover = drop_name(weights[jan], "AAA", 0.10)
+    assert "AAA" not in leftover.index
+    assert abs(float(leftover.sum()) - 1.0) < 1e-9
+

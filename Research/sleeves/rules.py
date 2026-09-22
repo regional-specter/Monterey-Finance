@@ -151,6 +151,12 @@ class BookRules:
     cost_bps: float = 10.0
     risk_free_rate: float = 0.02
     rebalance_freq: str = "ME"
+    # Paper 10: what to do when a held name fails AAOIFI between rebalances.
+    # month_end = status quo (drop at the next scheduled screen).
+    # same_day = drop on the first session the fail is known.
+    # next_open = drop on the session after that.
+    breach_exit: str = "month_end"
+    breach_monitor: str = "filings"  # filings | daily
 
 
 @dataclass
