@@ -212,7 +212,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Whether a blended steady-growth book beats any single sleeve on drawdown-adjusted compounding after Halal screens.
 
 <div>
-<img width="280" align="left" alt="Paper 07 12-config blend search equity curves" src="papers/07-book-construction/figures/blend-search/equity-curves.png" />
+<img width="480" align="left" alt="Paper 07 12-config blend search equity curves" src="papers/07-book-construction/figures/blend-search/equity-curves.png" />
 
 **One Halal Book, Not Four Labels:** *An Exploratory Sleeve Mix, 2019–2024*
 
@@ -229,7 +229,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** How much steady-growth path improves when concentration risk is forced down without killing the Halal quality core.
 
 <div>
-<img width="280" align="left" alt="Paper 08 name-cap ladder on FCF plus SMA" src="papers/08-risk-budget/figures/cap-ladder-equity.png" />
+<img width="480" align="left" alt="Paper 08 name-cap ladder on FCF plus SMA" src="papers/08-risk-budget/figures/cap-ladder-equity.png" />
 
 **Name Caps on the FCF Book:** *An Exploratory Risk Budget, 2019–2024*
 
@@ -246,7 +246,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 - **White Paper Focus:** Using dual-momentum-style regime logic as a whole-book drawdown brake, not as another stock-picking factor.
 
 <div>
-<img width="280" align="left" alt="Paper 09 SMA 200 cash versus defensive sleeve" src="papers/09-regime-throttle/figures/sma200-cash-vs-defensive.png" />
+<img width="480" align="left" alt="Paper 09 SMA 200 cash versus defensive sleeve" src="papers/09-regime-throttle/figures/sma200-cash-vs-defensive.png" />
 
 **Whole-NAV Trend Brake:** *An Exploratory Regime Throttle, 2019–2024*
 
