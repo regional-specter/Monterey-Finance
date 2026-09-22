@@ -216,7 +216,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 
 **One Halal Book, Not Four Labels:** *An Exploratory Sleeve Mix, 2019–2024*
 
-This is an internal exploratory note, not a finished proof and not a live-return target. Mixing FCF, ROIC, and dual momentum (40/40/20) did **not** make a steadier fund. The blend tracked FCF, lost about −27% in 2022 (worse than SPUS), and dual momentum as a 20% sleeve missed 2023. ROIC had almost no 2020–2022 history, so it could not be a second engine. Architecture takeaway: the stock list is **one quality funnel** (Halal screens, then FCF top half, cap-weighted). It is not a multi-strategy mix. SUE can add return in bull years; it is not the crash control.
+This is an internal exploratory note. Mixing FCF, ROIC, and dual momentum (40/40/20) did **not** make a steadier fund. The blend tracked FCF, lost about −27% in 2022 (worse than SPUS), and dual momentum as a 20% sleeve missed 2023. ROIC had almost no 2020–2022 history, so it could not be a second engine. Architecture takeaway: the stock list is **one quality funnel** (Halal screens, then FCF top half, cap-weighted). It is not a multi-strategy mix. SUE can add return in bull years; it is not the crash control.
 
 [Open the study](papers/07-book-construction/blend-search.ipynb)
 </div>
@@ -233,7 +233,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 
 **Name Caps on the FCF Book:** *An Exploratory Risk Budget, 2019–2024*
 
-This is an internal exploratory note, not a finished proof and not a live-return target. After paper 07, the book under test was FCF quality with a whole-NAV SPY SMA. Uncapped, the five largest names still held about 48% of the invested book. A 10% single-name cap cut that to about 37% and cut CAGR only from 17.9% to 16.8%. Max drawdown stayed about −9.5% — the crash path is the SMA, not the cap. A 5% cap started to flatten the FCF engine. Architecture takeaway: size risk with a **10% name lid**. Don't expect a cap to replace the market switch or fix the tech-heavy Halal mix.
+This is an internal exploratory note. After paper 07, the book under test was FCF quality with a whole-NAV SPY SMA. Uncapped, the five largest names still held about 48% of the invested book. A 10% single-name cap cut that to about 37% and cut CAGR only from 17.9% to 16.8%. Max drawdown stayed about −9.5% — the crash path is the SMA, not the cap. A 5% cap started to flatten the FCF engine. Architecture takeaway: size risk with a **10% name lid**. Don't expect a cap to replace the market switch or fix the tech-heavy Halal mix.
 
 [Open the study](papers/08-risk-budget/code.ipynb)
 </div>
@@ -250,7 +250,7 @@ This is an internal exploratory note, not a finished proof and not a live-return
 
 **Whole-NAV Trend Brake:** *An Exploratory Regime Throttle, 2019–2024*
 
-This is an internal exploratory note, not a finished proof and not a live-return target. The on/off switch belongs on **100% of NAV**, not inside a 20% sleeve. Always-on FCF (with the 10% cap) still had about a −29% max drawdown. SMA-to-cash cut that to about −8% to −9%. A “defensive” Halal sleeve while the trend was off still fell about −26% to −27% — it was not a crash hedge. Faster rules (50-day SMA → cash) passed the frozen 2022/2023 checks with more flips; cash beat defensive in every case. Architecture takeaway: when the market trend is down, the fund holds **cash**, not a second stock list.
+This is an internal exploratory note. The on/off switch belongs on **100% of NAV**, not inside a 20% sleeve. Always-on FCF (with the 10% cap) still had about a −29% max drawdown. SMA-to-cash cut that to about −8% to −9%. A “defensive” Halal sleeve while the trend was off still fell about −26% to −27% — it was not a crash hedge. Faster rules (50-day SMA → cash) passed the frozen 2022/2023 checks with more flips; cash beat defensive in every case. Architecture takeaway: when the market trend is down, the fund holds **cash**, not a second stock list.
 
 [Open the study](papers/09-regime-throttle/code.ipynb)
 </div>
