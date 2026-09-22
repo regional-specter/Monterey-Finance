@@ -48,10 +48,13 @@ sys.path.insert(0, str(Path("../..").resolve()))  # Research/
 
 from sleeves import FrozenRules, Lab
 
-rules = FrozenRules().with_book(name_cap=0.08, throttle="spy_sma")
-lab = Lab.from_frames(metrics, prices, fcf_history=fcf_history, sue_events=sue_events, rules=rules)
-state = lab.evaluate("2022-06-30")
-returns, log = lab.book(sleeve_weights={"fcf_quality": 0.4, "roic": 0.4, "sue": 0.2}).run()
+rules = FrozenRules().with_book(
+    sleeve_weights={"fcf_quality": 1.0},
+    name_cap=0.10,
+    throttle="spy_sma",
+)
+lab = Lab.from_frames(metrics, prices, rules=rules)
+returns, log = lab.book().run()
 ```
 
 ```text
@@ -83,17 +86,17 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-Do **07 → 12** first. **13–15** support the book once the core blend exists.
+Papers **07–09** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash. Do **10 → 12** next. **13–15** support the book once ops exist.
 
 | # | Study | Status |
 | --- | --- | --- |
-| **07** | Multi-strategy sleeve blend | Next |
-| **08** | Risk budget & concentration caps | Next |
-| **09** | Book-level regime throttle | Next |
+| **07** | Multi-strategy sleeve blend | Done |
+| **08** | Risk budget & concentration caps | Done |
+| **09** | Book-level regime throttle | Done |
 | **10** | Compliance breach exits | Next |
 | **11** | Purification process design | Next |
 | **12** | Turnover, costs & capacity | Next |
-| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 07–12 |
+| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 10–12 |
 
 ---
 
@@ -203,20 +206,56 @@ This is an internal exploratory note, not a finished proof and not a live-return
 
 ### Fund Book Construction
 
-**7. Multi-Strategy Sleeve Blend**
+**7. Multi-Strategy Sleeve Blend ✅**
 
 - **Mechanics:** Combine kept sleeves (FCF quality, ROIC, dual-momentum regime, optional SUE satellite) into one Halal book with explicit sleeve weights and a shared monthly rebalance calendar.
 - **White Paper Focus:** Whether a blended steady-growth book beats any single sleeve on drawdown-adjusted compounding after Halal screens.
 
-**8. Risk Budget & Concentration Caps**
+<div>
+<img width="280" align="left" alt="Paper 07 12-config blend search equity curves" src="papers/07-book-construction/figures/blend-search/equity-curves.png" />
+
+**One Halal Book, Not Four Labels:** *An Exploratory Sleeve Mix, 2019–2024*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. Mixing FCF, ROIC, and dual momentum (40/40/20) did **not** make a steadier fund. The blend tracked FCF, lost about −27% in 2022 (worse than SPUS), and dual momentum as a 20% sleeve missed 2023. ROIC had almost no 2020–2022 history, so it could not be a second engine. Architecture takeaway: the stock list is **one quality funnel** (Halal screens, then FCF top half, cap-weighted). It is not a multi-strategy mix. SUE can add return in bull years; it is not the crash control.
+
+[Open the study](papers/07-book-construction/blend-search.ipynb)
+</div>
+<br clear="all">
+
+
+**8. Risk Budget & Concentration Caps ✅**
 
 - **Mechanics:** Apply hard single-name and sector caps (and optional vol targeting) on the blended book; compare uncapped mega-cap concentration versus capped variants.
 - **White Paper Focus:** How much steady-growth path improves when concentration risk is forced down without killing the Halal quality core.
 
-**9. Book-Level Regime Throttle**
+<div>
+<img width="280" align="left" alt="Paper 08 name-cap ladder on FCF plus SMA" src="papers/08-risk-budget/figures/cap-ladder-equity.png" />
 
-- **Mechanics:** Run the blended book risk-on only when a market trend rule holds (e.g. SPY above 200-day SMA); otherwise cut equity exposure or shift to a defensive Halal sleeve.
+**Name Caps on the FCF Book:** *An Exploratory Risk Budget, 2019–2024*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. After paper 07, the book under test was FCF quality with a whole-NAV SPY SMA. Uncapped, the five largest names still held about 48% of the invested book. A 10% single-name cap cut that to about 37% and cut CAGR only from 17.9% to 16.8%. Max drawdown stayed about −9.5% — the crash path is the SMA, not the cap. A 5% cap started to flatten the FCF engine. Architecture takeaway: size risk with a **10% name lid**. Do not expect a cap to replace the market switch or to fix the tech-heavy Halal mix.
+
+[Open the study](papers/08-risk-budget/code.ipynb)
+</div>
+<br clear="all">
+
+
+**9. Book-Level Regime Throttle ✅**
+
+- **Mechanics:** Run the FCF book risk-on only when a market trend rule holds (e.g. SPY above its moving average); otherwise cut equity to cash or shift to a defensive Halal sleeve.
 - **White Paper Focus:** Using dual-momentum-style regime logic as a whole-book drawdown brake, not as another stock-picking factor.
+
+<div>
+<img width="280" align="left" alt="Paper 09 SMA 200 cash versus defensive sleeve" src="papers/09-regime-throttle/figures/sma200-cash-vs-defensive.png" />
+
+**Whole-NAV Trend Brake:** *An Exploratory Regime Throttle, 2019–2024*
+
+This is an internal exploratory note, not a finished proof and not a live-return target. The on/off switch belongs on **100% of NAV**, not inside a 20% sleeve. Always-on FCF (with the 10% cap) still had about a −29% max drawdown. SMA-to-cash cut that to about −8% to −9%. A “defensive” Halal sleeve while the trend was off still fell about −26% to −27% — it was not a crash hedge. Faster rules (50-day SMA → cash) passed the frozen 2022/2023 checks with more flips; cash beat defensive in every case. Architecture takeaway: when the market trend is down, the fund holds **cash**, not a second stock list.
+
+[Open the study](papers/09-regime-throttle/code.ipynb)
+</div>
+<br clear="all">
+
 
 ### Halal Operations & Friction
 
@@ -265,13 +304,13 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
-### Phase 1B — Fund book design (active next)
+### Phase 1B — Fund book design (07–09 done; 10–12 next)
 
-Stop hunting more single factors for now. Build the book we would actually run — papers **07–12** in the backlog below.
+Working architecture from 07–09: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash**.
 
-1. **Freeze winning sleeves** — e.g. quality (01), ROIC (02), regime / momentum (04), optional SUE satellite (06). High-beta (05) only if the risk budget allows it.
-2. **Combine into one portfolio (07)** — sleeve weights, rebalance rules, shared Halal universe.
-3. **Risk rules (08–09)** — single-name/sector caps; drawdown / trend throttle on the whole book.
+1. **Engine (07)** — one quality funnel, not a 40/40/20 mix. High-beta (05) stays out of the core.
+2. **Size rule (08)** — 10% single-name cap.
+3. **Market switch (09)** — SPY trend on/off on 100% of NAV; cash when off.
 4. **Halal ops (10–11)** — mid-period AAOIFI breach exits; purification as a real process.
 5. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
 
