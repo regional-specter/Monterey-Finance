@@ -53,6 +53,7 @@ rules = FrozenRules().with_book(
     name_cap=0.10,
     throttle="spy_sma",
     breach_exit="next_open",
+    purify_schedule="ex_date",
 )
 lab = Lab.from_frames(metrics, prices, rules=rules)
 returns, log = lab.book().run()
@@ -87,7 +88,7 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-Papers **07–10** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits. Do **11 → 12** next. **13–15** support the book once ops exist.
+Papers **07–11** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits, ex-date dividend purification. Do **12** next. **13–15** support the book once ops exist.
 
 | # | Study | Status |
 | --- | --- | --- |
@@ -95,9 +96,9 @@ Papers **07–10** built the working book: FCF quality engine, 10% name cap, who
 | **08** | Risk budget & concentration caps | Done |
 | **09** | Book-level regime throttle | Done |
 | **10** | Compliance breach exits | Done |
-| **11** | Purification process design | Next |
+| **11** | Purification process design | Done |
 | **12** | Turnover, costs & capacity | Next |
-| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 11–12 |
+| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 12 |
 
 ---
 
@@ -277,10 +278,22 @@ This is an internal exploratory note. The FCF book only re-screens at month-end.
 <br clear="all">
 
 
-**11. Purification Process Design**
+**11. Purification Process Design ✅**
 
 - **Mechanics:** Estimate impure dividend income on holdings, schedule purification cash outflows, and measure net investor path versus gross backtest returns.
 - **White Paper Focus:** Turning purification from a footnote into a runnable cash policy for a live Halal fund.
+
+<div>
+<img width="480" align="left" alt="Paper 11 purification schedule equity curves" src="papers/11-purification/figures/equity-curves.png" />
+
+**Donate on the Ex-Date:** *An Exploratory Purification Policy, 2019–2024*
+
+This is an internal exploratory note. Gross backtests keep the full dividend. AAOIFI still wants the interest-income slice donated. On the live FCF + SMA book we saw **1,189** dividends while held; **54%** had a usable impure ratio (mean about 1.1%). The covered hits sum to about **3.5 bp of NAV over five years**. Taking them out on the ex-date cuts CAGR by about **1 bp** and leaves max drawdown at **−9.0%**. Paying at quarter-end or year-end instead (letting the money ride) changes almost nothing. One storage REIT (EXR) posts an 83% ratio and dominates the tiny hit list — treat that as a data check, not a second engine. Architecture takeaway: quote investors on the **ex-date net path**. Batch the actual cheque quarterly if ops wants one. Do not skip purification because the drag is small; skip it only if the Sharia board says the ratio is missing.
+
+[Open the study](papers/11-purification/code.ipynb)
+</div>
+<br clear="all">
+
 
 **12. Turnover, Costs & Capacity**
 
@@ -317,15 +330,15 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
-### Phase 1B — Fund book design (07–10 done; 11–12 next)
+### Phase 1B — Fund book design (07–11 done; 12 next)
 
-Working architecture from 07–10: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits**.
+Working architecture from 07–11: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits + ex-date dividend purification**.
 
 1. **Engine (07)** — one quality funnel, not a 40/40/20 mix. High-beta (05) stays out of the core.
 2. **Size rule (08)** — 10% single-name cap.
 3. **Market switch (09)** — SPY trend on/off on 100% of NAV; cash when off.
 4. **Breach exits (10)** — if a held name fails AAOIFI on a new filing, sell at the **next session**; stay out until the next month-end screen.
-5. **Halal ops (11)** — purification as a real process.
+5. **Purification (11)** — donate the impure slice of dividends on the **ex-date**. Cheque ops may batch quarterly.
 6. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
 
 A topic in 1B is complete when the folder has a reproducible notebook, figures, and a short write-up that answers: *would we run this?*

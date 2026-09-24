@@ -157,6 +157,10 @@ class BookRules:
     # next_open = drop on the session after that.
     breach_exit: str = "month_end"
     breach_monitor: str = "filings"  # filings | daily
+    # Paper 11: when impure dividend cash leaves the investor path.
+    # off = keep it (gross backtest). ex_date = donate on the ex-session.
+    # quarter_end / year_end = let it ride, then write one cheque.
+    purify_schedule: str = "off"
 
 
 @dataclass

@@ -19,7 +19,7 @@ Typical notebook start:
 """
 
 from .book import SleeveBook, run_sleeve
-from .exits import apply_breach_exits, detect_breaches
+from .purify import apply_purification, held_dividends
 from .lab import Lab, SleeveState
 from .rules import (
     SLEEVE_IDS,
@@ -48,7 +48,9 @@ __all__ = [
     "SleeveBook",
     "SleeveState",
     "apply_breach_exits",
+    "apply_purification",
     "detect_breaches",
+    "held_dividends",
     "run_sleeve",
     "blend_sleeve_weights",
     "calc_performance_stats",

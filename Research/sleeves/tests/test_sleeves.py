@@ -6,6 +6,7 @@ from datetime import date
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from sleeves.fundamentals import attach_sue
 from sleeves.lab import Lab
@@ -245,4 +246,40 @@ def test_filing_breach_and_same_day_drop():
     leftover = drop_name(weights[jan], "AAA", 0.10)
     assert "AAA" not in leftover.index
     assert abs(float(leftover.sum()) - 1.0) < 1e-9
+
+
+def test_purify_ex_date_vs_year_end():
+    from sleeves.purify import apply_purification, held_dividends, weight_on
+
+    idx = pd.bdate_range("2024-01-02", periods=20)
+    weights = {date(2024, 1, 2): pd.Series({"AAA": 0.10})}
+    panel = pd.DataFrame({"AAA": np.full(len(idx), 100.0)}, index=idx)
+    purified = pd.DataFrame(
+        {
+            "symbol": ["AAA"],
+            "ex_date": [date(2024, 1, 3)],
+            "dividend": [2.0],
+            "impure_ratio": [0.05],
+            "purification_amount": [0.10],
+        }
+    )
+    events = held_dividends(purified, weights, panel)
+    assert len(events) == 1
+    assert events.iloc[0]["nav_frac"] == pytest.approx(0.10 * 0.10 / 100.0)
+
+    rets = pd.Series(0.0, index=idx)
+    rets.iloc[5] = 0.10
+    net_ex = apply_purification(rets, events, schedule="ex_date", price_index=idx)
+    net_ye = apply_purification(rets, events, schedule="year_end", price_index=idx)
+    eq_ex = (1 + net_ex).cumprod().iloc[-1]
+    eq_ye = (1 + net_ye).cumprod().iloc[-1]
+    eq_gr = (1 + rets).cumprod().iloc[-1]
+    assert eq_ex < eq_gr
+    assert eq_ye < eq_gr
+    # Delayed cheque lets the 10% up-day run on a larger NAV.
+    assert eq_ye > eq_ex
+    assert weight_on(weights, "AAA", date(2024, 1, 3)) == 0.10
+    off = pd.Series(False, index=idx)
+    assert weight_on(weights, "AAA", date(2024, 1, 3), throttle_on=off) == 0.0
+
 
