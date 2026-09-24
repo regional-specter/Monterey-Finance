@@ -363,8 +363,6 @@ This is an internal exploratory note. A holding is flagged if month-end debt/MC 
 
 ---
 
-## Phase 1A → 1B
-
 ### Phase 1A — Factor discovery (mostly done)
 
 Test one idea at a time: hypothesis → point-in-time backtest → white paper → keep / revise / kill.
