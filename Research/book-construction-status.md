@@ -302,8 +302,9 @@ throttle:     spy_sma (200-day). Full NAV in cash if SPY is at or below the aver
 name_cap:     10%
 breach_exit:  next_open (sell a failed AAOIFI name the session after the filing is known)
 purify:       ex_date (donate impure dividend slice when the stock goes ex)
+cost_bps:     10 (paid on buys+sells; SMA flips dominate)
+capacity:     about $800M at a 10% ADV cap (binding name: KDP in 2020)
 not in book:  roic, dual_momentum weight, sue, high_beta
-cost assumption: 10 basis points one-way
 ```
 
 In the `sleeves` package:
@@ -315,6 +316,7 @@ FrozenRules().with_book(
     name_cap=0.10,
     breach_exit="next_open",
     purify_schedule="ex_date",
+    cost_bps=10,
 )
 ```
 
@@ -358,7 +360,7 @@ Open items:
 | 09 | Regime throttle write-up | Config 8 is live. Write the rule, cash days, and 2020 lag. Do not re-grid weights. |
 | 10 | Compliance breach exits | Done. Next-session sell on a failed filing. Month-end wait left ~150 name-days non-compliant. P&L gap is tiny. |
 | 11 | Purification | Done. Donate on the ex-date. Drag is about 1 bp of CAGR. 54% of held dividends have a usable ratio. |
-| 12 | Turnover, costs, capacity | 10 bp was a stub. Measure real friction on this book. |
+| 12 | Turnover, costs, capacity | Done. 10 bp stub. One-way turnover ~343%/yr from SMA flips. 10% ADV capacity ~$842M. |
 | Later | Diversification / CVaR sizing | Sector concentration remains after the 10% name cap. |
 
 ---
@@ -378,8 +380,9 @@ Open items:
 | `papers/09-regime-throttle/code.ipynb` | SMA-to-cash versus defensive sleeve |
 | `papers/10-compliance-exits/code.ipynb` | Same-day / next-open / month-end AAOIFI exits |
 | `papers/10-compliance-exits/exit_lag_results.csv` | Numbers for paper 10 |
-| `papers/11-purification/code.ipynb` | Ex-date / quarter / year purification calendars |
-| `papers/11-purification/purify_results.csv` | Numbers for paper 11 |
+| `papers/12-turnover-capacity/code.ipynb` | Flat costs, SMA turnover, ADV capacity |
+| `papers/12-turnover-capacity/cost_ladder.csv` | Numbers for paper 12 costs |
+| `papers/12-turnover-capacity/capacity.csv` | Numbers for paper 12 AUM |
 | `sleeves/` | Frozen live rules for papers 01, 02, 04, 05, 06, 10, 11 |
 
 ---
@@ -397,5 +400,7 @@ The switch cuts the largest loss from about −29% to about −9%. The book is i
 Paper 10: if a held name fails AAOIFI on a new filing, sell at the **next session**. Waiting until month-end left about 150 name-days of known non-compliance. The return path barely moves.
 
 Paper 11: donate the impure slice of dividends on the **ex-date**. Covered hits are about 3.5 bp of NAV over five years (~1 bp of CAGR). Missing ratios on about half of dividends are a data gap, not a silent zero.
+
+Paper 12: 10 bp trading cost on buys and sells. SMA on/off is most of the turnover (~343% one-way per year). Do not raise past about **$800M** if a name cannot be more than 10% of 20-day dollar volume in one day.
 
 That is where we stand.

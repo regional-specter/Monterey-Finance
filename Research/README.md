@@ -54,6 +54,7 @@ rules = FrozenRules().with_book(
     throttle="spy_sma",
     breach_exit="next_open",
     purify_schedule="ex_date",
+    cost_bps=10,
 )
 lab = Lab.from_frames(metrics, prices, rules=rules)
 returns, log = lab.book().run()
@@ -88,7 +89,7 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-Papers **07–11** built the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits, ex-date dividend purification. Do **12** next. **13–15** support the book once ops exist.
+Papers **07–12** locked the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits, ex-date dividend purification, 10 bp cost stub, ~$800M ADV capacity. **13–15** are supporting diagnostics.
 
 | # | Study | Status |
 | --- | --- | --- |
@@ -97,7 +98,7 @@ Papers **07–11** built the working book: FCF quality engine, 10% name cap, who
 | **09** | Book-level regime throttle | Done |
 | **10** | Compliance breach exits | Done |
 | **11** | Purification process design | Done |
-| **12** | Turnover, costs & capacity | Next |
+| **12** | Turnover, costs & capacity | Done |
 | **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 12 |
 
 ---
@@ -295,10 +296,22 @@ This is an internal exploratory note. Gross backtests keep the full dividend. AA
 <br clear="all">
 
 
-**12. Turnover, Costs & Capacity**
+**12. Turnover, Costs & Capacity ✅**
 
-- **Mechanics:** Stress the blended book under trading-cost assumptions and AUM scales; find where liquidity and turnover break steady-growth economics.
+- **Mechanics:** Stress the live book under trading-cost assumptions and AUM scales; find where liquidity and turnover break steady-growth economics.
 - **White Paper Focus:** Practical capacity limits before Phase 2 capital raises.
+
+<div>
+<img width="480" align="left" alt="Paper 12 flat cost equity curves" src="papers/12-turnover-capacity/figures/equity-curves.png" />
+
+**Costs Are the SMA Switch; Size Caps Around $800M:** *An Exploratory Turnover and Capacity Study, 2019–2024*
+
+This is an internal exploratory note. The live book had **97** trade days. Annualized one-way turnover is about **343%**, almost all from SPY 200-day **on/off flips** (15 days to cash, 16 days back in), not from monthly FCF. A 10 bp flat cost on buys+sells cuts CAGR from 23.3% to **22.5%** and leaves max drawdown at **−9.1%**. 50 bp still passes the 2022 bar versus SPUS. Using 20-day median dollar volume, no name exceeds 10% of ADV at **$500M**. The first breach is at **$842M** (KDP around the 2020 cash switches). Architecture takeaway: keep **`cost_bps=10`** as the reporting stub. Do not raise past about **$800M** unless cash switches are spread over several days. Purification (~1 bp) is extra, not included in these cost lines.
+
+[Open the study](papers/12-turnover-capacity/code.ipynb)
+</div>
+<br clear="all">
+
 
 ### Portfolio Diagnostics (supporting)
 
@@ -330,16 +343,16 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
-### Phase 1B — Fund book design (07–11 done; 12 next)
+### Phase 1B — Fund book design (07–12 done)
 
-Working architecture from 07–11: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits + ex-date dividend purification**.
+Working architecture from 07–12: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits + ex-date dividend purification + 10 bp cost stub, capacity ~$800M**.
 
 1. **Engine (07)** — one quality funnel, not a 40/40/20 mix. High-beta (05) stays out of the core.
 2. **Size rule (08)** — 10% single-name cap.
 3. **Market switch (09)** — SPY trend on/off on 100% of NAV; cash when off.
 4. **Breach exits (10)** — if a held name fails AAOIFI on a new filing, sell at the **next session**; stay out until the next month-end screen.
 5. **Purification (11)** — donate the impure slice of dividends on the **ex-date**. Cheque ops may batch quarterly.
-6. **Costs and capacity (12)** — turnover budget; at what size the book breaks.
+6. **Costs and capacity (12)** — 10 bp reporting cost; do not raise past about $800M without multi-day SMA trades.
 
 A topic in 1B is complete when the folder has a reproducible notebook, figures, and a short write-up that answers: *would we run this?*
 

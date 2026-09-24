@@ -13,6 +13,7 @@ from sleeves.lab import Lab
 from sleeves.prices import spy_sma_risk_on
 from sleeves.rules import FrozenRules
 from sleeves.book import run_sleeve
+from sleeves.costs import apply_flat_costs, l1_trade, one_way, trade_calendar
 from sleeves.exits import apply_breach_exits, detect_breaches, drop_name, exit_session
 from sleeves.select import select_dual_momentum, select_fcf_quality, select_roic, select_sue
 from sleeves.weighting import blend_sleeve_weights
@@ -281,5 +282,27 @@ def test_purify_ex_date_vs_year_end():
     assert weight_on(weights, "AAA", date(2024, 1, 3)) == 0.10
     off = pd.Series(False, index=idx)
     assert weight_on(weights, "AAA", date(2024, 1, 3), throttle_on=off) == 0.0
+
+
+def test_turnover_to_cash_and_flat_cost():
+    prev = pd.Series({"AAA": 0.6, "BBB": 0.4})
+    curr = pd.Series({"AAA": 0.5, "CCC": 0.5})
+    assert l1_trade(prev, curr) == pytest.approx(1.0)  # 0.1+0.4 + 0.5
+    assert one_way(prev, pd.Series(dtype=float)) == pytest.approx(0.5)
+    assert l1_trade(prev, pd.Series(dtype=float)) == pytest.approx(1.0)
+
+    idx = pd.bdate_range("2024-01-02", periods=5)
+    weights = {date(2024, 1, 2): prev}
+    throttle = pd.Series([True, True, False, False, False], index=idx)
+    trades = trade_calendar(weights, idx, throttle_on=throttle)
+    assert (trades["to_cash"] == True).any()
+    assert float(trades.loc[trades["to_cash"], "traded_nav"].iloc[0]) == pytest.approx(1.0)
+
+    rets = pd.Series(0.01, index=idx)
+    net = apply_flat_costs(rets, trades, cost_bps=10)
+    # 10 bp on 100% NAV the cash day
+    cash_day = pd.Timestamp(trades.loc[trades["to_cash"], "date"].iloc[0])
+    assert net.loc[cash_day] == pytest.approx(0.01 - 0.001)
+
 
 
