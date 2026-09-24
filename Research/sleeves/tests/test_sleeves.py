@@ -305,4 +305,58 @@ def test_turnover_to_cash_and_flat_cost():
     assert net.loc[cash_day] == pytest.approx(0.01 - 0.001)
 
 
+def test_overlap_cvar_boundary():
+    from sleeves.diagnostics import (
+        boundary_flags,
+        cvar_weights,
+        daily_cvar,
+        drop_near_boundary,
+        is_near_boundary,
+        jaccard,
+        overlap_weight,
+    )
+
+    assert jaccard({"A", "B"}, {"B", "C"}) == pytest.approx(1 / 3)
+    wa = pd.Series({"A": 0.6, "B": 0.4})
+    wb = pd.Series({"A": 0.5, "C": 0.5})
+    assert overlap_weight(wa, wb) == pytest.approx(0.5)
+
+    r = pd.Series([-0.10] * 5 + [0.01] * 95)
+    assert daily_cvar(r, 0.05) == pytest.approx(-0.10)
+
+    cv = pd.Series({"A": -0.04, "B": -0.02, "C": -0.02})
+    w = cvar_weights(["A", "B", "C"], cv, name_cap=0.50)
+    assert float(w["A"]) < float(w["B"])
+    assert abs(float(w.sum()) - 1.0) < 1e-9
+    assert float(w.max()) <= 0.50 + 1e-12
+
+    near = pd.Series({"debt_ratio": 0.29, "cash_ratio": 0.10, "receivables_ratio": 0.20})
+    far = pd.Series({"debt_ratio": 0.10, "cash_ratio": 0.10, "receivables_ratio": 0.20})
+    assert is_near_boundary(near)
+    assert not is_near_boundary(far)
+
+    log = pd.DataFrame(
+        {
+            "symbol": ["AAA", "BBB"],
+            "as_of": [date(2024, 1, 31), date(2024, 1, 31)],
+            "weight": [0.6, 0.4],
+        }
+    )
+    metrics = pd.DataFrame(
+        {
+            "symbol": ["AAA", "BBB"],
+            "as_of": [date(2024, 1, 31), date(2024, 1, 31)],
+            "debt_ratio": [0.29, 0.10],
+            "cash_ratio": [0.05, 0.05],
+            "receivables_ratio": [0.10, 0.10],
+        }
+    )
+    flags = boundary_flags(log, metrics)
+    assert set(flags["symbol"]) == {"AAA"}
+    weights = {date(2024, 1, 31): pd.Series({"AAA": 0.6, "BBB": 0.4})}
+    trimmed = drop_near_boundary(weights, flags, name_cap=1.0)
+    assert "AAA" not in trimmed[date(2024, 1, 31)].index
+    assert trimmed[date(2024, 1, 31)]["BBB"] == pytest.approx(1.0)
+
+
 

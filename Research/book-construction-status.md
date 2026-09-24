@@ -1,7 +1,7 @@
 # Multi-strategy book construction and risk budget
 
-**Status note.** 21 September 2026.  
-**Scope.** Papers 07 and 08. Historical backtests only. No live capital.  
+**Status note.** 24 September 2026.  
+**Scope.** Papers 07–15. Historical backtests only. No live capital.  
 **Audience.** Applied data science. This note defines finance terms when they first appear.
 
 This document uses short sentences and one meaning for each term (ASD-STE 100 style).
@@ -349,19 +349,21 @@ Default `FrozenRules` still has older blend weights. The **research decision** i
 
 ---
 
-## 12. Next work (papers 09–12)
+## 12. Next work (papers 09–15)
 
-The backlog in `README.md` still lists 09 as “book-level regime throttle”. **Paper 08 already uses that throttle.** Paper 09 should not search for the same switch. Paper 09 can document the SMA as a frozen operations rule, or test one alternative switch without a weight search.
+Papers 09–15 are done. The live rule did not change.
 
-Open items:
-
-| Paper | Topic | Why it still matters |
+| Paper | Topic | Outcome |
 | --- | --- | --- |
-| 09 | Regime throttle write-up | Config 8 is live. Write the rule, cash days, and 2020 lag. Do not re-grid weights. |
-| 10 | Compliance breach exits | Done. Next-session sell on a failed filing. Month-end wait left ~150 name-days non-compliant. P&L gap is tiny. |
-| 11 | Purification | Done. Donate on the ex-date. Drag is about 1 bp of CAGR. 54% of held dividends have a usable ratio. |
-| 12 | Turnover, costs, capacity | Done. 10 bp stub. One-way turnover ~343%/yr from SMA flips. 10% ADV capacity ~$842M. |
-| Later | Diversification / CVaR sizing | Sector concentration remains after the 10% name cap. |
+| 09 | Regime throttle write-up | SMA-to-cash on 100% NAV is live. |
+| 10 | Compliance breach exits | Next-session sell on a failed filing. |
+| 11 | Purification | Donate on the ex-date. Drag ~1 bp of CAGR. |
+| 12 | Turnover, costs, capacity | 10 bp stub. 10% ADV capacity ~$842M. |
+| 13 | Overlap audit | FCF vs ROIC: 9% name Jaccard, 44% weight overlap, 0.92 daily corr. Keep one engine. |
+| 14 | CVaR sizing | Same names, inverse-tail weights. CAGR 23.3% → 21.0%. DD slightly worse. Keep cap-weight. |
+| 15 | Warning band 28/28/68 | 179 name-months. 7 of 25 filing fails already flagged. Path almost unchanged. Watch list only. |
+
+Sector concentration remains after the 10% name cap. CVaR sizing did not fix that without giving up 2023–2024.
 
 ---
 
@@ -383,7 +385,10 @@ Open items:
 | `papers/12-turnover-capacity/code.ipynb` | Flat costs, SMA turnover, ADV capacity |
 | `papers/12-turnover-capacity/cost_ladder.csv` | Numbers for paper 12 costs |
 | `papers/12-turnover-capacity/capacity.csv` | Numbers for paper 12 AUM |
-| `sleeves/` | Frozen live rules for papers 01, 02, 04, 05, 06, 10, 11 |
+| `papers/13-15-diagnostics/code.ipynb` | Overlap, CVaR weights, AAOIFI warning band |
+| `papers/13-15-diagnostics/sleeve_overlap.csv` | Jaccard and weight overlap |
+| `papers/13-15-diagnostics/diagnostics_scorecard.csv` | Live vs CVaR vs trim |
+| `sleeves/` | Frozen live rules for papers 01, 02, 04, 05, 06, 10–15 |
 
 ---
 
@@ -402,5 +407,11 @@ Paper 10: if a held name fails AAOIFI on a new filing, sell at the **next sessio
 Paper 11: donate the impure slice of dividends on the **ex-date**. Covered hits are about 3.5 bp of NAV over five years (~1 bp of CAGR). Missing ratios on about half of dividends are a data gap, not a silent zero.
 
 Paper 12: 10 bp trading cost on buys and sells. SMA on/off is most of the turnover (~343% one-way per year). Do not raise past about **$800M** if a name cannot be more than 10% of 20-day dollar volume in one day.
+
+Paper 13: FCF and ROIC share about 44% of weight and 0.92 daily correlation. Mixing them is not a second book.
+
+Paper 14: sizing by worst 5% of days cuts mega-caps and cuts CAGR. Keep cap-weight.
+
+Paper 15: names at 28% debt are a watch list. Most filing fails were not in that band the month before. Keep next-open sells.
 
 That is where we stand.

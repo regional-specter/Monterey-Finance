@@ -39,7 +39,7 @@ class SleeveState:
 
 @dataclass
 class Lab:
-    """Reusable research session for papers 07–12.
+    """Reusable research session for papers 07–15.
 
     Pass already-fetched frames (typical after a notebook download cell), or
     call :meth:`from_halalquant` once and reuse.

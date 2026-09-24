@@ -1,4 +1,4 @@
-"""Reusable Halal sleeves for papers 07–12.
+"""Reusable Halal sleeves for papers 07–15.
 
 Typical notebook start:
 
@@ -40,6 +40,14 @@ from .fundamentals import attach_sue, fetch_earnings_history
 from .stats import calc_performance_stats, stats_table
 from .triggers import sma_trigger
 from .weighting import blend_sleeve_weights
+from .diagnostics import (
+    boundary_flags,
+    cvar_weights,
+    drop_near_boundary,
+    mean_jaccard,
+    overlap_weight,
+    reweight_log_cvar,
+)
 
 __all__ = [
     "FrozenRules",
@@ -57,6 +65,12 @@ __all__ = [
     "run_sleeve",
     "trade_calendar",
     "blend_sleeve_weights",
+    "boundary_flags",
+    "cvar_weights",
+    "drop_near_boundary",
+    "mean_jaccard",
+    "overlap_weight",
+    "reweight_log_cvar",
     "calc_performance_stats",
     "attach_sue",
     "fetch_earnings_history",

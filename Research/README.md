@@ -89,7 +89,7 @@ Sharia compliance is a **hard constraint**. Screens are point-in-time. Failed na
 
 ## Active backlog (Phase 1B)
 
-Papers **07–12** locked the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits, ex-date dividend purification, 10 bp cost stub, ~$800M ADV capacity. **13–15** are supporting diagnostics.
+Papers **07–15** locked the working book: FCF quality engine, 10% name cap, whole-NAV trend throttle to cash, next-session AAOIFI breach exits, ex-date dividend purification, 10 bp cost stub, ~$800M ADV capacity. Papers 13–15 did not change that rule.
 
 | # | Study | Status |
 | --- | --- | --- |
@@ -99,7 +99,9 @@ Papers **07–12** locked the working book: FCF quality engine, 10% name cap, wh
 | **10** | Compliance breach exits | Done |
 | **11** | Purification process design | Done |
 | **12** | Turnover, costs & capacity | Done |
-| **13–15** | Diversification audit, CVaR sizing, boundary monitoring | After 12 |
+| **13** | Sleeve overlap / diversification audit | Done |
+| **14** | CVaR position sizing | Done |
+| **15** | AAOIFI boundary monitoring | Done |
 
 ---
 
@@ -315,20 +317,48 @@ This is an internal exploratory note. The live book had **97** trade days. Annua
 
 ### Portfolio Diagnostics (supporting)
 
-**13. Sleeve Correlation & Diversification Audit**
+**13. Sleeve Correlation & Diversification Audit** ✅
 
 - **Mechanics:** Measure pairwise correlations, overlapping holdings, and marginal risk contribution across quality, ROIC, momentum, and SUE sleeves.
 - **White Paper Focus:** Whether the blend is real diversification or the same mega-cap tech book counted four ways.
 
-**14. Tail-Risk Position Sizing (CVaR)**
+<div>
+<img width="480" align="left" alt="Paper 13 sleeve overlap" src="papers/13-15-diagnostics/figures/overlap.png" />
+
+**Same Dollars, Different Ticker Lists:** *An Exploratory Diversification Audit, 2019–2024*
+
+This is an internal exploratory note. FCF and ROIC share only about **9%** of names (Jaccard) on a typical month-end, but they share about **44%** of **weight** and their daily returns move together at **0.92**. Dual-momentum vs FCF is 0.78. SUE is the least aligned (0.55 vs FCF) and is still a small list. Live-book top-5 weight stays about **36%**. Architecture takeaway: do not add ROIC, dual-momentum, or SUE as extra sleeves. Paper 07 already killed the mix on 2020–2022 path. This audit says the dollars sit in the same large names even when the long tail of tickers differs.
+
+[Open the study](papers/13-15-diagnostics/code.ipynb)
+</div>
+<br clear="all">
+
+**14. Tail-Risk Position Sizing (CVaR)** ✅
 
 - **Mechanics:** Size positions (or sleeve weights) using downside risk / CVaR instead of equal or cap weights inside the Halal universe.
 - **White Paper Focus:** Left-tail control for a steady-growth mandate when conventional bonds and cash yield are limited.
 
-**15. Compliance Boundary Monitoring**
+<div>
+<img width="480" align="left" alt="Paper 14–15 equity curves" src="papers/13-15-diagnostics/figures/equity-curves.png" />
+
+**Cap-Weight Stays; CVaR Cuts the Mega-Caps:** *An Exploratory CVaR Sizing Study, 2019–2024*
+
+This is an internal exploratory note. Same FCF names, same 10% cap, same SMA cash, same next-open exits. Weights become 1 / |worst 5% of the last 60 days|. On 2024-12-31 that cut AAPL / MSFT / GOOG from **10%** each to about **1%**. CAGR falls from **23.3%** to **21.0%**. Max drawdown is slightly worse (−9.4% vs −9.0%). 2023 is the gap (24% vs 36%). Architecture takeaway: keep cap-weight.
+
+[Open the study](papers/13-15-diagnostics/code.ipynb)
+</div>
+<br clear="all">
+
+**15. Compliance Boundary Monitoring** ✅
 
 - **Mechanics:** Track names near AAOIFI ratio boundaries (e.g. debt/market cap `28%–29%`) and model pre-emptive trims before forced index / screen exits.
 - **White Paper Focus:** Early-warning compliance ops to reduce sudden turnover and gap risk in the live book.
+
+**Watch List, Not a Sell Rule:** *An Exploratory AAOIFI Warning-Band Study, 2019–2024*
+
+This is an internal exploratory note. A holding is flagged if month-end debt/MC ≥ **28%**, cash/MC ≥ **28%**, or receivables/MC ≥ **68%**. That is **179** name-months and **41** names. Dropping them and renormalizing barely moves the live path (CAGR **23.40%** vs **23.34%**, max drawdown still **−9.04%**). Of paper 10’s **25** filing fails, only **7** were already in the band at the prior month-end. The other 18 jumped the 30/30/70 line on the new 10-Q. Architecture takeaway: keep **next_open** sells after a fail. Use the 28/28/68 band as an ops watch list.
+
+[Open the study](papers/13-15-diagnostics/code.ipynb)
 
 
 ---
@@ -343,9 +373,9 @@ Test one idea at a time: hypothesis → point-in-time backtest → white paper �
 
 **What failed:** deep value and high-dividend ranking (old value/dividend studies). In our window they underweight the Halal mega-cap growth core that dominates SPUS. That family is **not** in the active backlog.
 
-### Phase 1B — Fund book design (07–12 done)
+### Phase 1B — Fund book design (07–15 done)
 
-Working architecture from 07–12: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits + ex-date dividend purification + 10 bp cost stub, capacity ~$800M**.
+Working architecture from 07–15: **FCF quality list + 10% name cap + whole-NAV trend throttle to cash + next-session AAOIFI breach exits + ex-date dividend purification + 10 bp cost stub, capacity ~$800M**.
 
 1. **Engine (07)** — one quality funnel, not a 40/40/20 mix. High-beta (05) stays out of the core.
 2. **Size rule (08)** — 10% single-name cap.
@@ -353,6 +383,9 @@ Working architecture from 07–12: **FCF quality list + 10% name cap + whole-NAV
 4. **Breach exits (10)** — if a held name fails AAOIFI on a new filing, sell at the **next session**; stay out until the next month-end screen.
 5. **Purification (11)** — donate the impure slice of dividends on the **ex-date**. Cheque ops may batch quarterly.
 6. **Costs and capacity (12)** — 10 bp reporting cost; do not raise past about $800M without multi-day SMA trades.
+7. **Overlap (13)** — FCF and ROIC share dollars, not a second book. Leave ROIC / dual-momentum / SUE out of the live mix.
+8. **CVaR size (14)** — do not replace cap-weight. Inverse-tail weights shrink the mega-caps and cut the bull years.
+9. **Warning band (15)** — 28/28/68 is an ops list. It does not replace next-open sells after a failed filing.
 
 A topic in 1B is complete when the folder has a reproducible notebook, figures, and a short write-up that answers: *would we run this?*
 
