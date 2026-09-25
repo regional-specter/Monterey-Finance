@@ -158,10 +158,36 @@ These rules apply to both ends. They stop the product from looking like generic 
 
 ---
 
+## Implementation (current)
+
+Code lives in [`ops/`](../ops/) at the repo root (a Python package cannot sit in a folder name with spaces). `halalquant` 0.3.0 is the data layer. This step writes **today’s intended book**. It does not send orders.
+
+```bash
+# From the repo root. Needs a prepared ~/.halalquant cache.
+python -m ops run --as-of today
+python -m ops run --as-of today --skip-refresh   # facts already fresh
+python -m ops run --as-of today --coverage
+```
+
+Each run writes `ops/runs/YYYY-MM-DD/`:
+
+| File | Meaning |
+| --- | --- |
+| `summary.json` | Date, SMA on/off, cash weight, holding count, top 5 names |
+| `intended_book.csv` | Target weights **after** the cash switch (empty rows if 100% cash) |
+| `invested_book.csv` | The FCF list we would hold if the SMA were on |
+| `filing_fails.csv` | New 10-Q/10-K AAOIFI fails on those names (library reports; we do not sell here) |
+
+Offline tests: `pytest ops/tests` from the repo root.
+
+**Not built yet:** paper broker, OMS diff, NAV ledger, dashboards.
+
+---
+
 ## Build order
 
-1. Incremental **halalquant** refresh + filing-event breach feed (library, not this UI)
-2. Target-weight job that writes today’s intended book
+1. Incremental **halalquant** refresh + filing-event breach feed — **done in [halalquant v0.3.0](https://github.com/regional-specter/halalquant/releases/tag/v0.3.0)**
+2. Target-weight job that writes today’s intended book — **in `ops/`**
 3. OMS-lite + one paper broker
 4. Reconciliation, kill switch, **NAV ledger**
 5. Operator terminal (health + order matrix) so we can see if the loop is honest
